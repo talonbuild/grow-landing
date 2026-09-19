@@ -10,7 +10,11 @@ import { site } from "@/config/site";
 import { UTM_KEYS, attributionUrl, getUtm } from "@/lib/attribution";
 
 export type KitMode = "form" | "script" | "placeholder";
-export type SubscribeResult = { ok: true } | { ok: false; message: string };
+export type SubscribeResult =
+  | { ok: true }
+  | { ok: false; message: string }
+  /** Kit's spam guard wants a human check first; send the visitor to `url` to finish. */
+  | { ok: "guard"; url: string };
 
 export function kitMode(): KitMode {
   const { mode, formId, embedUid, embedScriptSrc } = site.kit;
@@ -62,9 +66,14 @@ export async function subscribe(email: string): Promise<SubscribeResult> {
     });
     const data = (await res.json().catch(() => null)) as {
       status?: string;
+      url?: string;
       errors?: { messages?: string[] };
     } | null;
     if (res.ok && data?.status === "success") return { ok: true };
+    // Kit quarantines submissions its bot filter is unsure about and answers with a "guard"
+    // page (a reCAPTCHA + Subscribe button). Completing it finishes the signup; the form's
+    // redirect URL in Kit then brings the visitor back here with ?joined=1.
+    if (res.ok && data?.status === "quarantined" && data.url) return { ok: "guard", url: data.url };
 
     const first = data?.errors?.messages?.[0] ?? "";
     console.warn("[grow:kit] Signup failed:", data ?? res.status);

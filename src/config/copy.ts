@@ -132,6 +132,9 @@ export const copy = {
        if the incentive/double opt-in email is turned on in Kit. */
     success: "You're in. We'll email you the moment GROW is live.",
     invalid: "That does not look like an email address.",
+    guardTitle: "One more step.",
+    guardBody: "A quick security check finishes your signup.",
+    guardCta: "Continue",
     error: "Something went wrong. Please try again.",
     notConnected: "Signups open very soon. Please check back shortly.",
   },

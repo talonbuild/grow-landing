@@ -7,7 +7,7 @@ import { site } from "@/config/site";
 import { trackOnce, track } from "@/lib/analytics";
 import { isValidEmail, kitFormAction, kitMode, subscribe } from "@/lib/kit";
 
-type Status = "idle" | "submitting" | "success" | "error";
+type Status = "idle" | "submitting" | "success" | "error" | "guard";
 
 /** Lets the page respond to a signup (the brain fills completely). */
 function markJoined() {
@@ -61,12 +61,22 @@ function NativeForm({
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
+  const [guardUrl, setGuardUrl] = useState("");
   const successRef = useRef<HTMLParagraphElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (status === "success") successRef.current?.focus();
   }, [status]);
+
+  // Back from Kit's security check: the form's redirect URL in Kit points at /?joined=1.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("joined") !== "1") return;
+    track("email_signup_success", { form_location: location, via: "kit_guard" });
+    markJoined();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reflecting a URL flag on mount
+    setStatus("success");
+  }, [location]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -84,10 +94,13 @@ function NativeForm({
     track("email_submit", { form_location: location });
 
     const result = await subscribe(email);
-    if (result.ok) {
+    if (result.ok === true) {
       track("email_signup_success", { form_location: location });
       markJoined();
       setStatus("success");
+    } else if (result.ok === "guard") {
+      setGuardUrl(result.url);
+      setStatus("guard");
     } else {
       setStatus("error");
       setError(result.message);
@@ -112,6 +125,19 @@ function NativeForm({
         <p ref={successRef} tabIndex={-1} className="text-left text-[1rem] font-medium leading-snug text-ink outline-none">
           {copy.form.success}
         </p>
+      </div>
+    );
+  }
+
+  if (status === "guard") {
+    return (
+      <div className="signup-shell signup-guard" role="status">
+        <p className="signup-guard-text">
+          <strong>{copy.form.guardTitle}</strong> {copy.form.guardBody}
+        </p>
+        <a href={guardUrl} className="btn-primary signup-button signup-guard-cta">
+          {copy.form.guardCta}
+        </a>
       </div>
     );
   }
