@@ -1,0 +1,596 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Brain Test — every class is .bt-*. White page, Arial 500 body, sector colours
+   only where they mean something (selection, tags, the brain).
+   ═══════════════════════════════════════════════════════════════════════════ */
+.bt {
+  --bt-ink: #0b1f2a;
+  --bt-ink-70: rgb(11 31 42 / 0.7);
+  --bt-ink-12: rgb(11 31 42 / 0.12);
+  --bt-ink-soft: #3a4c56;
+  --bt-muted: #5c6b74;
+  --bt-hairline: #e4ebef;
+  --bt-mist: #f5f9fb;
+  --bt-physical: #16885c;
+  --bt-physical-deep: #0f6b48; /* the band green: white text on it clears AA with room */
+  --bt-mental: #164b91;
+  --bt-life: #65a8cf;
+  --bt-radius: 1rem;
+  position: relative;
+  max-width: 40rem;
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  padding-bottom: clamp(4rem, 10vh, 7rem);
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: 500;
+  color: var(--bt-ink);
+}
+
+/* Steps and the result land 20px under the fixed header (BrainTest.tsx); this gap keeps the
+   blurred header over whitespace rather than over the lede's last line. */
+.bt[data-phase="steps"],
+.bt[data-phase="result"] {
+  margin-top: calc(var(--header-h, 3.25rem) + 2.25rem);
+}
+
+/* Intro */
+.bt-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.bt-start {
+  height: 3.25rem;
+  padding: 0 1.75rem;
+  font-size: 1rem;
+}
+.bt-intro-meta {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--bt-muted);
+}
+
+/* Header: step label + 2px progress */
+.bt-head {
+  margin-bottom: 2rem;
+}
+.bt-step-label {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--bt-ink-70);
+}
+.bt-progress {
+  margin-top: 0.625rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--bt-ink-12);
+  overflow: hidden;
+}
+.bt-progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--bt-ink);
+  transition: width 320ms ease-out;
+}
+
+/* Panel */
+.bt-panel {
+  will-change: transform, opacity;
+}
+.bt-prompt {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.375rem, 1rem + 1.4vw, 1.75rem);
+  line-height: 1.22;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  outline: none;
+}
+.bt-prompt:focus-visible {
+  outline: 2px solid var(--bt-mental);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+.bt-help-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+.bt-help {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--bt-ink-soft);
+}
+.bt-count {
+  flex: none;
+  font-size: 0.875rem;
+  color: var(--bt-ink-70);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Step 1: groups + chips */
+.bt-groups {
+  display: grid;
+  gap: 1.75rem;
+  margin-top: 2rem;
+}
+.bt-group-title.band-eyebrow {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 1;
+  color: var(--bt-ink-soft);
+}
+.bt-group-title.band-eyebrow .band-eyebrow-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+.bt-group-title[data-sector="physical"] .band-eyebrow-dot {
+  background: var(--bt-physical);
+}
+.bt-group-title[data-sector="mental"] .band-eyebrow-dot {
+  background: var(--bt-mental);
+}
+.bt-group-title[data-sector="life"] .band-eyebrow-dot {
+  background: var(--bt-life);
+}
+.bt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.bt-chip {
+  --bt-sector: var(--bt-ink);
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--bt-ink-12);
+  background: #fff;
+  color: var(--bt-ink);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+.bt-chip[data-sector="physical"] {
+  --bt-sector: var(--bt-physical);
+}
+.bt-chip[data-sector="mental"] {
+  --bt-sector: var(--bt-mental);
+}
+.bt-chip[data-sector="life"] {
+  --bt-sector: var(--bt-life);
+}
+@media (hover: hover) {
+  .bt-chip:hover:not([aria-disabled]) {
+    border-color: rgb(11 31 42 / 0.3);
+  }
+}
+.bt-chip:active:not([aria-disabled]) {
+  transform: scale(0.98);
+}
+.bt-chip[aria-pressed="true"] {
+  background: var(--bt-sector);
+  border-color: var(--bt-sector);
+  color: #fff;
+}
+.bt-chip[data-sector="physical"][aria-pressed="true"] {
+  background: var(--bt-physical-deep);
+  border-color: var(--bt-physical-deep);
+}
+/* Sky is too light to carry white text; Life selects in sky with ink text. */
+.bt-chip[data-sector="life"][aria-pressed="true"] {
+  color: var(--bt-ink);
+}
+.bt-chip[aria-disabled] {
+  opacity: 0.4;
+  cursor: default;
+}
+.bt-chip:focus-visible {
+  outline: 2px solid var(--bt-mental);
+  outline-offset: 3px;
+}
+
+/* Steps 2–4: radio rows */
+.bt-radios {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+}
+.bt-radio {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--bt-radius);
+  border: 1px solid var(--bt-hairline);
+  background: #fff;
+  color: var(--bt-ink);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+@media (max-width: 40rem) {
+  .bt-radio {
+    font-size: 1rem;
+  }
+}
+@media (hover: hover) {
+  .bt-radio:hover {
+    border-color: rgb(11 31 42 / 0.3);
+  }
+}
+.bt-radio[aria-checked="true"] {
+  border-color: var(--bt-ink);
+  background: var(--bt-mist);
+}
+.bt-radio:focus-visible {
+  outline: 2px solid var(--bt-mental);
+  outline-offset: 3px;
+}
+.bt-ring {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 1.5px solid rgb(11 31 42 / 0.35);
+  background: #fff;
+  transition: border 150ms ease;
+}
+.bt-radio[aria-checked="true"] .bt-ring {
+  border: 6px solid var(--bt-ink);
+}
+.bt-radio-label {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Footer */
+.bt-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--bt-hairline);
+}
+/* The hint sits on its own line above the buttons, where the tap happened. Empty, it takes no space. */
+.bt-foot-hint {
+  flex-basis: 100%;
+  order: -1;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--bt-ink);
+  text-align: right;
+}
+.bt-foot-hint:empty {
+  display: none;
+}
+.bt-back {
+  padding: 0.5rem 0.75rem;
+  margin-left: -0.75rem;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--bt-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgb(11 31 42 / 0.3);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.bt-back:hover {
+  color: var(--bt-ink);
+}
+.bt-back:focus-visible {
+  outline: 2px solid var(--bt-mental);
+  outline-offset: 3px;
+}
+.bt-continue {
+  margin-left: auto;
+  height: 3rem;
+  padding: 0 1.5rem;
+  font-size: 0.9375rem;
+}
+/* Not disabled: a tap on the quiet button shows the hint instead of doing nothing.
+   Ink on a hairline pill stays legible (6.3:1) where a faded fill did not. */
+.bt-continue[aria-disabled="true"] {
+  background: #fff;
+  color: var(--bt-ink-70);
+  box-shadow: inset 0 0 0 1px var(--bt-ink-12);
+}
+.bt-continue[aria-disabled="true"]:hover {
+  background: #fff;
+}
+.bt-continue[aria-disabled="true"]:active {
+  transform: none;
+}
+
+/* Result */
+.bt-result-kicker.band-eyebrow {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 1;
+  color: var(--bt-ink-soft);
+}
+.bt-result-kicker[data-sector="physical"] .band-eyebrow-dot {
+  background: var(--bt-physical);
+}
+.bt-result-kicker[data-sector="mental"] .band-eyebrow-dot {
+  background: var(--bt-mental);
+}
+.bt-result-kicker[data-sector="life"] .band-eyebrow-dot {
+  background: var(--bt-life);
+}
+.bt-result-title {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 1.2rem + 2.4vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  outline: none;
+}
+.bt-result-title:focus-visible {
+  outline: 2px solid var(--bt-mental);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+.bt-result-line {
+  margin-top: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--bt-ink-soft);
+}
+.bt-result-grid {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 2.25rem;
+}
+@media (min-width: 40rem) {
+  .bt-result-grid {
+    grid-template-columns: 14rem 1fr;
+    gap: 2rem;
+  }
+}
+.bt-brain {
+  margin: 0;
+  width: 100%;
+}
+.bt-brain-art {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 14rem);
+  padding: 6%;
+}
+@media (max-width: 40rem) {
+  .bt-brain-art {
+    margin-inline: auto;
+  }
+  .bt-brain-caption {
+    text-align: center;
+  }
+}
+.bt-brain .grow-brain-water {
+  transition-duration: 900ms;
+  transition-delay: 0ms;
+}
+.bt-brain-caption {
+  margin-top: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--bt-ink);
+}
+.bt-result-text {
+  display: grid;
+  gap: 0.875rem;
+}
+.bt-why {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--bt-ink);
+}
+.bt-brain-note {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--bt-muted);
+}
+@media (max-width: 40rem) {
+  .bt-why {
+    font-size: 1rem;
+  }
+}
+
+.bt-h3 {
+  margin-top: 2.5rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--bt-ink);
+}
+.bt-actions {
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--bt-hairline);
+}
+.bt-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--bt-hairline);
+  animation: bt-row-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 40ms + 120ms);
+}
+.bt-action-n {
+  flex: none;
+  width: 1.75rem;
+  padding-top: 0.125rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--bt-ink-70);
+  font-variant-numeric: tabular-nums;
+}
+.bt-action-body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+.bt-action-name {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  color: var(--bt-ink);
+}
+.bt-action-sub {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--bt-muted);
+}
+.bt-tag {
+  flex: none;
+  align-self: flex-start;
+  margin-top: 0.125rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.bt-tag[data-sector="physical"] {
+  color: var(--bt-physical-deep);
+  background: rgb(22 136 92 / 0.1);
+}
+.bt-tag[data-sector="mental"] {
+  color: var(--bt-mental);
+  background: rgb(22 75 145 / 0.1);
+}
+.bt-tag[data-sector="life"] {
+  color: var(--bt-ink);
+  background: rgb(101 168 207 / 0.28);
+}
+
+@media (max-width: 40rem) {
+  .bt-action {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    column-gap: 0.875rem;
+    row-gap: 0.5rem;
+  }
+  .bt-action-body,
+  .bt-tag {
+    grid-column: 2;
+  }
+  .bt-tag {
+    justify-self: start;
+    margin-top: 0;
+  }
+}
+
+.bt-notes {
+  display: grid;
+  gap: 0.5rem;
+}
+.bt-note .bt-h3 {
+  margin-top: 2rem;
+}
+.bt-note p {
+  margin-top: 0.5rem;
+  max-width: 34rem;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--bt-ink-soft);
+}
+@media (max-width: 40rem) {
+  .bt-note p,
+  .bt-action-name {
+    font-size: 1rem;
+  }
+}
+
+.bt-cta {
+  margin-top: 3rem;
+  max-width: 28rem;
+}
+.bt-disclaimer {
+  margin-top: 2rem;
+  max-width: 34rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--bt-muted);
+}
+.bt-retake {
+  margin-top: 1rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--bt-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgb(11 31 42 / 0.3);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.bt-retake:hover {
+  color: var(--bt-ink);
+}
+.bt-retake:focus-visible {
+  outline: 2px solid var(--bt-mental);
+  outline-offset: 3px;
+}
+
+@keyframes bt-row-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bt-progress-fill,
+  .bt-chip,
+  .bt-radio,
+  .bt-ring {
+    transition: none;
+  }
+  .bt-brain .grow-brain-water {
+    transition: none;
+  }
+  .bt-action {
+    animation: none;
+  }
+}
