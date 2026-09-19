@@ -17,7 +17,11 @@ npm run build    # production build (also type-checks)
 npm run lint
 ```
 
-Deploy: import the folder into Vercel (framework preset: Next.js). No server code, no secrets required.
+## Deploy — GitHub Pages at grow.talonapp.co
+
+The site is a static export (`output: "export"` in `next.config.ts`; `npm run build` writes `./out`). Repo: `talonbuild/grow-landing`. Every push to `main` runs `.github/workflows/deploy.yml` (lint → Brain Test tests → build → deploy to Pages). Pages source is GitHub Actions; custom domain `grow.talonapp.co` (Namecheap CNAME `grow` → `talonbuild.github.io`; `public/CNAME` and `public/.nojekyll` ship in the export).
+
+Build-time settings live as **repository variables** (Settings → Secrets and variables → Actions → Variables): `KIT_FORM_ID` (Kit form ID — public by design), `GA4_ID` (optional). Change one, then re-run the workflow (Actions → Deploy to GitHub Pages → Run workflow) or push.
 
 ---
 
