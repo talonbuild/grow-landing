@@ -429,6 +429,58 @@ html[data-band="dark"] .site-header {
   }
 }
 
+/* Phone order: headline → waitlist + App Store → the brain creeping in at the bottom of
+   the first screen → the "GROW is…" line. The copy wrapper dissolves (display: contents)
+   so its children can be reordered around the brain. Desktop keeps the two-column layout. */
+@media (max-width: 63.98rem) {
+  .hero {
+    align-items: stretch;
+    padding-top: calc(var(--header-h) + 1.25rem);
+    padding-bottom: 1rem;
+  }
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    container-type: inline-size;
+    /* Taller than one screen on purpose: the brain is pushed down this box so its top edge
+       lands at ~75% of the first screen — the labels and the tops of the sectors creep in,
+       the rest is below the fold. 75svh + brain height (≈1.03 × its width) + the visual's
+       bottom padding + the "GROW is…" line that follows (~5.5rem) − the hero's top padding. */
+    min-height: calc(75svh + 1.03 * (100vw - 3.5rem) + 6.25rem - var(--header-h));
+  }
+  .hero-copy {
+    display: contents;
+  }
+  .hero-copy > .eyebrow {
+    order: 1;
+    align-self: flex-start;
+  }
+  .hero-copy > .display-hero {
+    order: 2;
+    margin-top: 1rem;
+  }
+  .hero-copy > .hero-actions {
+    order: 3;
+    width: 100%;
+    max-width: 28rem;
+    margin-top: 1.5rem;
+    gap: 0.75rem;
+  }
+  .hero-visual {
+    order: 4;
+    width: 100%;
+    margin-top: auto;
+    padding: 1.5rem 0.5rem 2rem;
+  }
+  .hero-copy > .hero-sub {
+    order: 5;
+    margin-top: 0.25rem;
+    max-width: 32rem;
+  }
+}
+
 /* ── The hero brain: three sector layers in a 3D stage ─────────────────── */
 .hero-brain {
   position: relative;
