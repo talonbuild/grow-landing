@@ -65,6 +65,8 @@ The locked "App Store · Coming soon" buttons become real App Store links (swap 
 
 **`"script"` — Kit's JavaScript embed.** Kit → **Publish** → **JavaScript** gives `<script async data-uid="…" src="…">`. Paste `data-uid` into `embedUid` and `src` into `embedScriptSrc`, and set `mode: "script"`. Kit renders its own markup; `globals.css` (`.kit-embed`) restyles it to match as closely as Kit's CSS allows.
 
+**Live form:** ID `9931121` ("Grow — Launch Waitlist & Growth Tips"), set as the `KIT_FORM_ID` repo variable. It is single opt-in (incentive email off), so the success copy does not mention a confirmation email.
+
 **Not configured:** `next dev` shows a labelled placeholder that simulates success. A production build without Kit shows "Signups open very soon" instead of pretending to succeed.
 
 Never add a Kit API key or secret to this project — none is needed.

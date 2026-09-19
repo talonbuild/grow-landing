@@ -127,7 +127,10 @@ export const copy = {
     label: "Email address",
     placeholder: "Your email",
     submitting: "Signing you up…",
-    success: "You're in. Check your inbox to confirm your email.",
+    /* Kit form 9931121 is single opt-in (no confirmation email), so the success line must not
+       ask people to check their inbox. Switch back to "Check your inbox to confirm your email."
+       if the incentive/double opt-in email is turned on in Kit. */
+    success: "You're in. We'll email you the moment GROW is live.",
     invalid: "That does not look like an email address.",
     error: "Something went wrong. Please try again.",
     notConnected: "Signups open very soon. Please check back shortly.",
