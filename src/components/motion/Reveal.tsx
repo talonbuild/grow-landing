@@ -4,7 +4,8 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import { useRef, type ReactNode } from "react";
 
 /**
- * Fades and lifts its children into place when they enter the viewport, once.
+ * Gently lifts its children into place when they enter the viewport, once.
+ * Content stays visible and at rest in server-rendered HTML if JavaScript fails.
  * Also stamps `data-in` on the element so CSS inside (e.g. brain water) can react.
  */
 export function Reveal({
@@ -21,6 +22,7 @@ export function Reveal({
   delay?: number;
   y?: number;
   as?: "div" | "section" | "li" | "figure" | "p" | "h2" | "h3";
+  id?: string;
   className?: string;
   amount?: number;
   /** Reveal only once the element is well inside the viewport — for content on colour bands, so text lands on its own colour. */
@@ -36,9 +38,9 @@ export function Reveal({
       ref={ref as never}
       className={className}
       data-in={inView || undefined}
-      initial={reduced ? false : { opacity: 0, y }}
-      animate={inView ? { opacity: 1, y: 0 } : undefined}
-      transition={{ duration: 0.95, ease: [0.2, 0.7, 0.2, 1], delay: delay / 1000 }}
+      initial={false}
+      animate={inView && reduced === false ? { y: [y, 0] } : { y: 0 }}
+      transition={{ duration: reduced ? 0 : 0.95, ease: [0.2, 0.7, 0.2, 1], delay: reduced ? 0 : delay / 1000 }}
       {...rest}
     >
       {children}

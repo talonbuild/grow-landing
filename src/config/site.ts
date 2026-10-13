@@ -15,8 +15,8 @@ export const site = {
 
   /**
    * Production origin used for canonical and Open Graph URLs (no trailing slash).
-   * Set NEXT_PUBLIC_SITE_URL in Vercel once the domain is final. Until then the
-   * Vercel production URL is used, and localhost in development.
+   * NEXT_PUBLIC_SITE_URL overrides the origin for a different deployment.
+   * The public GitHub Pages site is the default.
    */
   url:
     process.env.NEXT_PUBLIC_SITE_URL ||
@@ -27,14 +27,14 @@ export const site = {
   /* ── LAUNCH ─────────────────────────────────────────────────────────────── */
   launch: {
     /**
-     * "prelaunch" → the email launch list is the primary action everywhere.
-     * "live"      → "Download Grow" becomes the primary action (requires appStoreUrl).
-     *               The email form stays on the page as the secondary action.
+     * The public site links directly to the live App Store listing.
+     * Keep status and appStoreUrl aligned for analytics and shared CTA helpers.
      */
-    status: "prelaunch" as LaunchStatus,
+    status: "live" as LaunchStatus,
 
-    /** Paste the live App Store URL here, e.g. "https://apps.apple.com/app/grow/id0000000000". */
-    appStoreUrl: "",
+    appStoreUrl: "https://apps.apple.com/us/app/grow-daily-habit-tracker/id6758687009",
+    /** Apple's numeric app ID, also used by the iOS Smart App Banner. */
+    appStoreId: "6758687009",
 
     /** While in "prelaunch", also show a secondary "Download Grow" button (only if appStoreUrl is set). */
     showAppStoreCtaDuringPrelaunch: false,

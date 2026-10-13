@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
 
 import { GrowBrain } from "@/components/brain/GrowBrain";
-import { GrowSignupForm } from "@/components/GrowSignupForm";
+import { AppStoreButton } from "@/components/site/AppStoreButton";
 import {
   brainTestCopy as copy,
   CATEGORY_LABEL,
@@ -514,7 +514,8 @@ function Result({ result, onRetake, takeFocus }: { result: BrainTestResult; onRe
       </div>
 
       <div className="bt-cta">
-        <GrowSignupForm location="brain-test-result" buttonLabel={r.cta} note={r.ctaNote} />
+        <AppStoreButton location="brain-test-result" />
+        <p className="signup-note">{r.ctaNote}</p>
       </div>
 
       <p className="bt-disclaimer">{r.disclaimer}</p>

@@ -205,7 +205,7 @@ test("per-sector cap is never reachable; the plan never exceeds 6", () => {
 
 test("recovery line and first target follow the answers", () => {
   const r = scoreBrainTest(answers({ picks: ["low-energy"], recovery: "fresh-start" }));
-  assert.ok(r.recovery.startsWith("The fresh start is tomorrow at 7:00 a.m."));
+  assert.ok(r.recovery.startsWith("The fresh start is tomorrow at 5:00 a.m."));
   assert.equal(r.firstTarget, "Complete every Physical action three days running. In GROW, three days is a Frequency: your first checkpoint, and your first chance to adjust the plan.");
   assert.equal(r.brainCaption, "Start with Physical. Grow it for three days.");
   assert.equal(r.headline, "Your starter Brainwave: FIRST MOVE");

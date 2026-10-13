@@ -12,7 +12,7 @@ const at = (x: number, y: number) => ({ left: `${((x - VB.x) / VB.w) * 100}%`, t
 type Anchor = "start" | "middle" | "end";
 
 /**
- * The GROW day as a ring: 7:00 a.m. at the top, 7:00 p.m. at the bottom. The arc draws
+ * A daily routine as a ring, with morning and evening markers. The arc draws
  * as the section scrolls and each step lights as the arc reaches it. The ring is SVG;
  * the labels are HTML placed over it so they render at real, readable font sizes.
  */
@@ -41,7 +41,7 @@ export function CycleDial() {
           transform="rotate(-90 50 50)"
           style={{ pathLength: reduced ? 1 : scrollYProgress }}
         />
-        {/* 7:00 a.m. and 7:00 p.m. marks */}
+        {/* Morning and evening ritual markers; these do not set the 5 a.m. day rollover. */}
         <line x1="50" y1="8.5" x2="50" y2="14" className="dial-tick" />
         <line x1="50" y1="86" x2="50" y2="91.5" className="dial-tick" />
       </svg>

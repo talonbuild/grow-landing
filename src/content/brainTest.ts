@@ -90,8 +90,7 @@ export const brainTestCopy = {
     busyDayTitle: "On a busy day",
     brainNote:
       "The three fills show where your starter plan puts its weight, not where you are today. A sector with no action stays a faint line until you add one at your first checkpoint.",
-    cta: "Join the waitlist",
-    ctaNote: "Your plan lives in the app at launch. The waitlist is how you get there.",
+    ctaNote: "Available for iPhone and iPad. Subscription required.",
     disclaimer:
       "These are consistency patterns you reported, not a diagnosis. GROW is a consistency app, not medical or psychological advice.",
   },
@@ -203,7 +202,7 @@ export const RECOVERY_STEP: SingleStep<RecoveryId> = {
     { id: "next-day", label: "I get back to it the next day", effect: "Recovery line confirms you already do what the app asks after a miss." },
     { id: "becomes-a-few", label: "One missed day often becomes a few", effect: "Recovery line stresses the one-day window and that one action, any action, brings the streak back." },
     { id: "rethink", label: "I rethink the whole plan", effect: "Recovery line says the plan waits for the next checkpoint; a missed day only needs one action." },
-    { id: "fresh-start", label: "I wait for a fresh start", effect: "Recovery line makes 7:00 a.m. tomorrow the fresh start and one action the price of keeping the streak." },
+    { id: "fresh-start", label: "I wait for a fresh start", effect: "Recovery line makes 5:00 a.m. tomorrow the fresh start and one action the price of keeping the streak." },
   ],
 };
 
@@ -256,7 +255,7 @@ export const RECOVERY_LINE: Record<RecoveryId, string> = {
   "next-day": "You already do what GROW asks. Miss a day and your streak goes dormant, not dead. Do one action the next day and it carries on.",
   "becomes-a-few": "GROW gives you one day of grace. Miss a day, then do one action the next day. Not the whole plan. One action brings the streak back.",
   rethink: "Do not rethink it. A missed day only pauses the streak; one action the next day brings it back. Change the plan at your next checkpoint, not on a bad day.",
-  "fresh-start": "The fresh start is tomorrow at 7:00 a.m. Miss a day, do one action the next day, and the streak carries on.",
+  "fresh-start": "The fresh start is tomorrow at 5:00 a.m. Miss a day, do one action the next day, and the streak carries on.",
 };
 
 export const BUSY_DAY_LINE = "On a busy day, one action still counts. Complete any one action in your Brainwave and that is a day you showed up.";

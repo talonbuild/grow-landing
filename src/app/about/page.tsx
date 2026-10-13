@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { GrowBrain } from "@/components/brain/GrowBrain";
-import { GrowSignupForm } from "@/components/GrowSignupForm";
+import { AppStoreButton } from "@/components/site/AppStoreButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { ShinyText } from "@/components/motion/ShinyText";
 import { PageEffects } from "@/components/PageEffects";
@@ -41,7 +41,8 @@ export default function AboutPage() {
             </Reveal>
           </div>
           <Reveal className="page-cta" amount={0.2}>
-            <GrowSignupForm location="about" buttonLabel={c.cta} note={c.ctaNote} />
+            <AppStoreButton location="about" />
+            <p className="download-note">{c.ctaNote}</p>
           </Reveal>
         </article>
         <div className="page-brain" aria-hidden="true">
