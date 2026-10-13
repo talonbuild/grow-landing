@@ -1,5 +1,5 @@
 import { HeroBrain, type SectorNavItem } from "@/components/brain/HeroBrain";
-import { GrowSignupForm } from "@/components/GrowSignupForm";
+import Link from "next/link";
 import { ShinyText } from "@/components/motion/ShinyText";
 import { AppStoreButton } from "@/components/site/AppStoreButton";
 import { Band } from "@/components/site/Band";
@@ -31,8 +31,11 @@ export function Hero() {
             {copy.hero.subline}
           </p>
           <div className="hero-actions enter" style={{ animationDelay: "270ms" }}>
-            <GrowSignupForm location="hero" buttonLabel={copy.hero.cta} note={copy.hero.ctaNote} />
-            <AppStoreButton location="hero" className="hero-store" />
+            <div className="hero-download-row">
+              <AppStoreButton location="hero" className="hero-store" />
+              <Link href="/brain-test" className="hero-secondary">{copy.hero.secondaryCta} <span aria-hidden="true">→</span></Link>
+            </div>
+            <p className="download-note">{copy.hero.ctaNote}</p>
           </div>
         </div>
 

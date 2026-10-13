@@ -1,14 +1,13 @@
 /**
- * All user-facing copy. The locked lines (headline, brain labels) never change; the rest is
- * the copy deck (written by a three-writer / two-judge panel on 2026-09-18, then edited).
- * Components only read from here.
+ * Shared site copy. Brain Test content lives in src/content/brainTest.ts and legal
+ * text lives in src/content/legal.ts. Preserve the core headline and brain labels.
  */
 
 export const copy = {
   meta: {
     title: "Grow — What You Repeat Changes What You Become",
     description:
-      "GROW is a daily consistency app. Choose your actions, follow through, and watch an evolving brain record it. Coming to the App Store.",
+      "Build daily habits with GROW. Choose your actions, follow through, and watch your brain grow. Available now on the App Store for iPhone and iPad.",
   },
 
   nav: {
@@ -22,13 +21,13 @@ export const copy = {
   headline: ["What you repeat", "changes what you become."],
 
   hero: {
-    eyebrow: "Consistency, measured",
+    eyebrow: "Now on the App Store",
     subline: "GROW is a daily consistency app: choose your actions, follow through, and watch an evolving brain record it.",
-    /* Alternates: GROW is a daily consistency app: choose your actions, commit to them, and come back every day.; GROW is a daily consistency app that turns the actions you repeat into a brain you can watch grow.; GROW is a daily consistency app: one plan, three sectors, and a brain that grows when you follow through. */
-    cta: "Join the waitlist",
-    ctaNote: "One email when GROW is live. Nothing else.",
+    cta: "Download Grow",
+    secondaryCta: "Find your starting point",
+    ctaNote: "Available for iPhone and iPad. Subscription required.",
     /** Big line on the locked App Store button (small line reads "App Store"). */
-    appStoreLocked: "Coming soon",
+    appStoreLocked: "Download unavailable",
   },
 
   /** Locked labels; hints and targets are editable. */
@@ -55,15 +54,15 @@ export const copy = {
     sector: "Mental",
     eyebrow: "Why Prime?",
     headline: "One loop, every day.",
-    lede: "A GROW cycle runs from 7:00 a.m. to 7:00 a.m. Inside it, four steps. Rituals clear the way. Actions do the work.",
+    lede: "A GROW cycle runs from 5:00 a.m. to 5:00 a.m. Inside it, four steps. Rituals clear the way. Actions do the work.",
     loop: [
-      { step: "Prime", body: "From 7:00 a.m. A short checklist to set up your environment and remove friction before you act." },
+      { step: "Prime", body: "A short morning checklist to set up your environment and remove friction before you act." },
       { step: "Act", body: "Open a sector. Check off its actions. Record how each one felt, if you want to." },
-      { step: "Reset", body: "From 7:00 p.m. Settle your environment and prepare tomorrow." },
+      { step: "Reset", body: "An evening ritual to settle your environment and prepare tomorrow." },
       { step: "Reflect", body: "Write about an action, the whole cycle, or anything on your mind. Optional, always." },
     ],
     closing: "Prime and Reset support the routine. Only completed actions earn growth.",
-    dial: { morning: "7:00 a.m.", evening: "7:00 p.m.", caption: "One cycle. 7:00 a.m. to 7:00 a.m." },
+    dial: { morning: "Morning", evening: "Evening", caption: "One cycle. 5:00 a.m. to 5:00 a.m." },
   },
 
   progress: {
@@ -83,10 +82,9 @@ export const copy = {
 
   final: {
     headline: "Lock in.",
-    /* Alternates: Be first.; Be there on day one.; Start on day one.; "Start growing." */
-    body: "GROW is coming to the App Store. Leave your email and you will hear from us once, on launch day.",
-    cta: "Join the waitlist",
-    note: "One email at launch. Not a newsletter.",
+    body: "Your next action is a place to start. Download GROW, build your Brainwave, and make today count.",
+    cta: "Download Grow",
+    note: "Available for iPhone and iPad. Subscription required.",
   },
 
   about: {
@@ -96,31 +94,15 @@ export const copy = {
       "We are Marcos and Leo. We built GROW because we kept starting over. The plans were fine. The follow-through was not.",
       "So we built something small and strict. One daily plan, a Brainwave. Three sectors: Physical, Mental, Life. A day counts when you complete one action. A sector grows when you complete all of them.",
       "We were careful about what earns growth. Rituals help, but they do not count. Reflection is there when you want it, not as homework. Miss a day and you get one cycle to come back, because a single bad day should not erase a good month.",
-      "GROW is made by Talon Build LLC and is coming to the App Store. If you want to lock in, we would like you there first.",
+      "GROW is made by Talon Build LLC and is available now on the App Store for iPhone and iPad. If you want to lock in, we built it for you.",
     ],
     signoff: "— Marcos & Leo",
-    cta: "Join the waitlist",
-    ctaNote: "One email when GROW is live. Nothing else.",
-  },
-
-  brainTest: {
-    eyebrow: "Coming to the app",
-    headline: "Where does your consistency live?",
-    body: "A short assessment that maps how you follow through onto the brain: Physical, Mental, Life. It is coming to GROW after launch. Here is a taste.",
-    sampleQuestions: [
-      { prompt: "When you set a goal, what usually happens in week two?", options: ["I keep going as planned", "I slow down but stay with it", "I quietly drop it"] },
-      { prompt: "What gets in the way most often?", options: ["My phone", "My energy", "My schedule"] },
-      { prompt: "When you miss a day, what usually happens next?", options: ["I come back the next day", "I take a few days off", "I start over from scratch"] },
-    ],
-    lockedLabel: "Available after launch",
-    resultLabel: "Your brain, mapped",
-    resultNote: "Each sector fills to match how you follow through. A first look at the result screen.",
-    cta: "Join the waitlist",
-    ctaNote: "Be first in line for the app and the test.",
+    cta: "Download Grow",
+    ctaNote: "Available for iPhone and iPad. Subscription required.",
   },
 
   footer: {
-    tagline: "A daily consistency app by Talon Build LLC. Coming to the App Store.",
+    tagline: "A daily consistency app by Talon Build LLC. Available now on the App Store.",
   },
 
   form: {
@@ -130,12 +112,12 @@ export const copy = {
     /* Kit form 9931121 is single opt-in (no confirmation email), so the success line must not
        ask people to check their inbox. Switch back to "Check your inbox to confirm your email."
        if the incentive/double opt-in email is turned on in Kit. */
-    success: "You're in. We'll email you the moment GROW is live.",
+    success: "You're signed up.",
     invalid: "That does not look like an email address.",
     guardTitle: "One more step.",
     guardBody: "A quick security check finishes your signup.",
     guardCta: "Continue",
     error: "Something went wrong. Please try again.",
-    notConnected: "Signups open very soon. Please check back shortly.",
+    notConnected: "Email signup is unavailable. Please try again later.",
   },
 } as const;

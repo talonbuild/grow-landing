@@ -4,16 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { Wordmark } from "@/components/brand/Wordmark";
+import { AppStoreLink } from "@/components/CtaLinks";
 import { copy } from "@/config/copy";
 import { site } from "@/config/site";
 
 const tabs = [
   { href: "/about", label: copy.nav.about },
-  { href: "/privacy", label: copy.nav.privacy },
   { href: "/brain-test", label: copy.nav.brainTest },
 ];
 
-/** Grow + home icon on the left; About · Privacy · Brain Test on the right. Adapts to the band beneath it. */
+/** Product navigation and a persistent download link. Legal links live in the footer. */
 export function SiteHeader() {
   const pathname = usePathname();
   return (
@@ -32,6 +32,7 @@ export function SiteHeader() {
               {t.label}
             </Link>
           ))}
+          <AppStoreLink location="header" className="nav-download">Download</AppStoreLink>
         </nav>
       </div>
     </header>

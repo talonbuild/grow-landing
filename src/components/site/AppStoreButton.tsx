@@ -3,8 +3,7 @@ import { copy } from "@/config/copy";
 import { site } from "@/config/site";
 
 /**
- * The App Store button. Locked ("Coming soon") until site.launch.appStoreUrl is set,
- * then a real link. Swap the inner markup for Apple's official badge at launch.
+ * Shared download button with a non-interactive fallback if its URL is removed.
  */
 export function AppStoreButton({ location, className = "" }: { location: string; className?: string }) {
   if (site.launch.appStoreUrl) {

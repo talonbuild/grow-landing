@@ -183,6 +183,31 @@ html[data-band="dark"] .site-header {
   outline-offset: 2px;
   border-radius: 6px;
 }
+.nav-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding-inline: 1rem;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+.nav-download:hover { background: var(--color-mental); }
+.nav-download:focus-visible { outline: 2px solid var(--color-mental); outline-offset: 3px; }
+html[data-band="dark"] .nav-download { background: #fff; color: var(--color-ink); }
+html[data-band="dark"] .nav-download:focus-visible { outline-color: #fff; }
+@media (max-width: 40rem) {
+  .site-header-inner { gap: 0.5rem; }
+  .site-nav { gap: clamp(0.5rem, 2.5vw, 0.9rem); }
+  .site-tab, .nav-download { font-size: 0.8125rem; }
+  .nav-download { padding-inline: 0.8rem; }
+  .home-icon { display: none; }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Bands — full-width sections. Each band paints its own colour (--band), so text
@@ -414,6 +439,30 @@ html[data-band="dark"] .site-header {
 .hero-store {
   align-self: flex-start;
 }
+.hero-download-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+}
+.hero-secondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  gap: 0.5rem;
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-underline-offset: 0.25rem;
+}
+.hero-secondary:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.download-note {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+.hero-actions .download-note { margin-top: 0; }
 .hero-visual {
   position: relative;
   width: min(100%, 34rem);
@@ -429,9 +478,7 @@ html[data-band="dark"] .site-header {
   }
 }
 
-/* Phone order: headline → waitlist + App Store → the brain creeping in at the bottom of
-   the first screen → the "GROW is…" line. The copy wrapper dissolves (display: contents)
-   so its children can be reordered around the brain. Desktop keeps the two-column layout. */
+/* Mobile visitors see what Grow does and how to get it before the brain illustration. */
 @media (max-width: 63.98rem) {
   .hero {
     align-items: stretch;
@@ -444,11 +491,6 @@ html[data-band="dark"] .site-header {
     align-items: stretch;
     gap: 0;
     container-type: inline-size;
-    /* Taller than one screen on purpose: the brain is pushed down this box so its top edge
-       lands at ~75% of the first screen — the labels and the tops of the sectors creep in,
-       the rest is below the fold. 75svh + brain height (≈1.03 × its width) + the visual's
-       bottom padding + the "GROW is…" line that follows (~5.5rem) − the hero's top padding. */
-    min-height: calc(75svh + 1.03 * (100vw - 3.5rem) + 6.25rem - var(--header-h));
   }
   .hero-copy {
     display: contents;
@@ -462,21 +504,21 @@ html[data-band="dark"] .site-header {
     margin-top: 1rem;
   }
   .hero-copy > .hero-actions {
-    order: 3;
+    order: 4;
     width: 100%;
     max-width: 28rem;
     margin-top: 1.5rem;
     gap: 0.75rem;
   }
   .hero-visual {
-    order: 4;
+    order: 5;
     width: 100%;
-    margin-top: auto;
+    margin-top: 1.75rem;
     padding: 1.5rem 0.5rem 2rem;
   }
   .hero-copy > .hero-sub {
-    order: 5;
-    margin-top: 0.25rem;
+    order: 3;
+    margin-top: 1rem;
     max-width: 32rem;
   }
 }
@@ -1051,6 +1093,7 @@ html[data-band="dark"] .site-header {
 .final-actions .signup-note {
   text-align: center;
 }
+.final-actions .download-note { margin-top: 0; color: rgb(255 255 255 / 0.88); text-align: center; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Footer
@@ -1298,12 +1341,12 @@ html[data-band="dark"] .site-header {
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
-    height: 3rem;
-    padding: 0 1.1rem 0 0.9rem;
-    border-radius: 999px;
+    min-height: 3.5rem;
+    padding: 0.5rem 1.15rem;
+    border-radius: 0.8rem;
     border: 1px solid var(--color-hairline);
-    background: #fff;
-    color: var(--color-ink);
+    background: var(--color-ink);
+    color: #fff;
     text-decoration: none;
     white-space: nowrap;
     transition:
@@ -1311,8 +1354,11 @@ html[data-band="dark"] .site-header {
       transform 0.2s var(--ease-out-soft);
   }
   a.btn-store:hover {
-    border-color: var(--color-ink);
+    transform: translateY(-2px);
+    border-color: currentColor;
   }
+  a.btn-store:focus-visible { outline: 2px solid var(--color-mental); outline-offset: 4px; }
+  a.btn-store-dark:focus-visible { outline-color: #fff; }
   .btn-store-locked {
     color: var(--color-ink-soft);
     cursor: default;
@@ -1320,8 +1366,8 @@ html[data-band="dark"] .site-header {
   }
   .btn-store-apple,
   .btn-store-lock {
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.6rem;
+    height: 1.6rem;
     flex: none;
   }
   .btn-store-text {
@@ -1335,14 +1381,14 @@ html[data-band="dark"] .site-header {
     opacity: 0.85;
   }
   .btn-store-big {
-    font-size: 0.9375rem;
+    font-size: 1.2rem;
     font-weight: 700;
     letter-spacing: -0.01em;
   }
   .btn-store-dark {
-    background: rgb(255 255 255 / 0.07);
-    border-color: rgb(255 255 255 / 0.18);
-    color: rgb(255 255 255 / 0.88);
+    background: #fff;
+    border-color: #fff;
+    color: var(--color-ink);
   }
 }
 

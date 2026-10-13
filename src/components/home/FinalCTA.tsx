@@ -1,5 +1,4 @@
 import { GrowBrain } from "@/components/brain/GrowBrain";
-import { GrowSignupForm } from "@/components/GrowSignupForm";
 import { Reveal } from "@/components/motion/Reveal";
 import { ShinyText } from "@/components/motion/ShinyText";
 import { AppStoreButton } from "@/components/site/AppStoreButton";
@@ -16,15 +15,15 @@ export function FinalCTA() {
           <div className="brain-halo brain-halo-dark" aria-hidden="true" />
           <GrowBrain id="final" fills={{ physical: 1, mental: 1, life: 1 }} fluid decorative />
         </Reveal>
-        <Reveal as="h2" delay={80} className="display-final">
+        <Reveal as="h2" id="final-title" delay={80} className="display-final">
           <ShinyText tone="white">{c.headline}</ShinyText>
         </Reveal>
         <Reveal as="p" delay={140} className="final-body">
           {c.body}
         </Reveal>
         <Reveal delay={200} className="final-actions">
-          <GrowSignupForm location="final" tone="dark" buttonLabel={c.cta} note={c.note} />
           <AppStoreButton location="final" className="btn-store-dark" />
+          <p className="download-note">{c.note}</p>
         </Reveal>
       </div>
       <SiteFooter />

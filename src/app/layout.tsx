@@ -5,7 +5,7 @@ import { AnalyticsScripts } from "@/components/AnalyticsScripts";
 import { ScrollBackground } from "@/components/site/ScrollBackground";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { copy } from "@/config/copy";
-import { site } from "@/config/site";
+import { isLive, site } from "@/config/site";
 
 import "./globals.css";
 
@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   },
   description: copy.meta.description,
   applicationName: site.name,
+  itunes: isLive ? { appId: site.launch.appStoreId } : undefined,
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
