@@ -9,7 +9,9 @@
 - `web-design-guidelines`: fetches Vercel's latest rules from GitHub on each run, then reviews the named files.
 - `playwright-cli`: browser automation (global CLI, config in `.playwright/cli.config.json`). Web only; it cannot drive the native GROW app.
 
-GROW's existing brand always wins over a skill's house style: keep the colours, type and brain/Noggin art in `src/app/globals.css`, `src/config/` and `src/components/brain/` unless Marcos asks for a change.
+## Brand: read `DESIGN.md` first
+
+`DESIGN.md` (approved by Marcos 2026-10-17) is GROW's design system for the redesign: palette and contrast, type and the caps rule, Noggin rig rules, calm Finch motion, components, and open decisions. Read it before any design or UI work. It wins over any skill's house style or reference DESIGN.md; its "Notes for design skills" section lists the brand choices that generic lint rules should not flag. Noggin is drawn only by the canonical rig, never redrawn or AI-generated.
 
 ## Design references (on demand only)
 
