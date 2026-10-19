@@ -430,6 +430,18 @@ html:has(.gd) {
   padding: 2rem var(--pad) max(2rem, env(safe-area-inset-bottom));
 }
 
+/* Cards below the fold arrive together (components/home-day/Arrive.tsx): once a card is on
+   screen and its phone pictures are loaded, its words, phone and Noggin fade in at once. */
+.gd-card[data-arrive] > * {
+  transition:
+    opacity 0.7s ease,
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.gd-card[data-arrive="wait"] > * {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
 /* Gentle float for Noggin --------------------------------------------------------------- */
 @keyframes gd-float {
   0%,
@@ -657,6 +669,12 @@ html:has(.gd) {
 @media (prefers-reduced-motion: reduce) {
   .gd-float {
     animation: none;
+  }
+  .gd-card[data-arrive] > * {
+    transition: opacity 0.3s ease;
+  }
+  .gd-card[data-arrive="wait"] > * {
+    transform: none;
   }
   .wc-track,
   .wc-arrow,

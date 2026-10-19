@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { Arrive } from "@/components/home-day/Arrive";
 import { Device } from "@/components/home-day/Device";
 import { WorldsCarousel } from "@/components/home-day/WorldsCarousel";
-import { Reveal } from "@/components/motion/Reveal";
 import { PageEffects } from "@/components/PageEffects";
 import { AppStoreButton } from "@/components/site/AppStoreButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -63,23 +63,17 @@ export default function Home() {
   const [how, medal, night, waits, day90] = cards;
 
   const card = (c: (typeof cards)[number], side: "left" | "right") => (
-    <section key={c.id} id={c.id} className="gd-card gd-split" data-tone={c.tone} data-side={side} aria-labelledby={`${c.id}-title`}>
+    <Arrive key={c.id} id={c.id} className="gd-card gd-split" data-tone={c.tone} data-side={side} aria-labelledby={`${c.id}-title`}>
       <div className="gd-words">
-        <Reveal>
-          <Title lines={c.headline} id={`${c.id}-title`} />
-        </Reveal>
-        <Reveal as="p" className="gd-sub" delay={80}>
-          {c.sub}
-        </Reveal>
-        <Reveal as="p" className="gd-body" delay={140}>
-          {c.body}
-        </Reveal>
+        <Title lines={c.headline} id={`${c.id}-title`} />
+        <p className="gd-sub">{c.sub}</p>
+        <p className="gd-body">{c.body}</p>
       </div>
-      <Reveal className="gd-visual" delay={120}>
+      <div className="gd-visual">
         <Screen screen={c.phone} />
         {c.noggin && <Noggin src={c.noggin.src} alt={c.noggin.alt} className="gd-float" />}
-      </Reveal>
-    </section>
+      </div>
+    </Arrive>
   );
 
   return (
@@ -116,42 +110,32 @@ export default function Home() {
       {card(how, "right")}
 
       {/* Midday: the three worlds */}
-      <section id="worlds" className="gd-card gd-worlds" data-tone="sky" aria-labelledby="worlds-title">
+      <Arrive id="worlds" className="gd-card gd-worlds" data-tone="sky" aria-labelledby="worlds-title">
         <div className="gd-center">
-          <Reveal>
-            <Title lines={worlds.headline} id="worlds-title" />
-          </Reveal>
-          <Reveal as="p" className="gd-sub" delay={80}>
-            {worlds.sub}
-          </Reveal>
+          <Title lines={worlds.headline} id="worlds-title" />
+          <p className="gd-sub">{worlds.sub}</p>
         </div>
-        <Reveal delay={90}>
-          <WorldsCarousel items={worlds.items} />
-        </Reveal>
-      </section>
+        <WorldsCarousel items={worlds.items} />
+      </Arrive>
 
       {card(medal, "left")}
 
       {/* Evening: widgets */}
-      <section className="gd-card gd-widgets" data-tone="lilac" aria-labelledby="widgets-title">
+      <Arrive className="gd-card gd-widgets" data-tone="lilac" aria-labelledby="widgets-title">
         <div className="gd-center">
-          <Reveal>
-            <Title lines={widgets.headline} id="widgets-title" />
-          </Reveal>
-          <Reveal as="p" className="gd-sub" delay={80}>
-            {widgets.sub}
-          </Reveal>
+          <Title lines={widgets.headline} id="widgets-title" />
+          <p className="gd-sub">{widgets.sub}</p>
         </div>
-        <Reveal className="gd-widget-art" delay={120}>
+        <div className="gd-widget-art">
           <Image src={widgets.src} alt={widgets.alt} width={1300} height={868} sizes="(max-width: 48rem) 92vw, 1040px" />
-        </Reveal>
-      </section>
+        </div>
+      </Arrive>
 
       {card(night, "right")}
       {card(waits, "left")}
       {card(day90, "right")}
 
-      <section id="faq" className="gd-card gd-faq" data-tone="paper" aria-labelledby="faq-title">
+      <Arrive id="faq" className="gd-card gd-faq" data-tone="paper" aria-labelledby="faq-title">
         <h2 className="gd-title gd-faq-title" id="faq-title">
           {faq.title}
         </h2>
@@ -171,9 +155,9 @@ export default function Home() {
             </details>
           ))}
         </div>
-      </section>
+      </Arrive>
 
-      <section className="gd-card gd-final" data-tone="dawn" aria-labelledby="final-title">
+      <Arrive className="gd-card gd-final" data-tone="dawn" aria-labelledby="final-title">
         <Image className="gd-icon" src="/media/kit/brand-app-icon.webp" alt="The GROW app icon" width={256} height={256} />
         <Title lines={final.headline} id="final-title" />
         <p className="gd-sub">{final.sub}</p>
@@ -181,7 +165,7 @@ export default function Home() {
           <AppStoreButton location="final" />
           <p className="gd-note">{hero.note}</p>
         </div>
-      </section>
+      </Arrive>
 
       <SiteFooter />
       <PageEffects />
