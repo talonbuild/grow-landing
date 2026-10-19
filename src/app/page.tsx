@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Device } from "@/components/home-day/Device";
+import { WorldsCarousel } from "@/components/home-day/WorldsCarousel";
 import { Reveal } from "@/components/motion/Reveal";
 import { PageEffects } from "@/components/PageEffects";
 import { AppStoreButton } from "@/components/site/AppStoreButton";
@@ -124,16 +125,9 @@ export default function Home() {
             {worlds.sub}
           </Reveal>
         </div>
-        <ul className="gd-world-row">
-          {worlds.items.map((w, i) => (
-            <Reveal as="li" key={w.lobe} className="gd-world" data-lobe={w.lobe} delay={90 * i}>
-              <Screen screen={w} />
-              <p className="gd-world-name">
-                <strong>{w.name}</strong> {w.place}
-              </p>
-            </Reveal>
-          ))}
-        </ul>
+        <Reveal delay={90}>
+          <WorldsCarousel items={worlds.items} />
+        </Reveal>
       </section>
 
       {card(medal, "left")}
