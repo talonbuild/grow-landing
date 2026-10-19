@@ -1,535 +1,437 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
+import Image from "next/image";
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 
-import { GrowBrain } from "@/components/brain/GrowBrain";
 import { AppStoreButton } from "@/components/site/AppStoreButton";
+import { Title } from "@/components/site/Title";
 import {
+  actionName,
+  ADD_LINE,
+  BEST_STEP,
   brainTestCopy as copy,
-  CATEGORY_LABEL,
-  GOAL_STEP,
+  CHECKINS,
+  FOCUS_STEP,
+  focusCta,
   isCompleteAnswers,
-  OUTCOME_STEP,
-  PATTERN_MAX,
-  PATTERN_MIN,
-  PATTERN_STEP,
-  PATTERNS,
-  RECOVERY_STEP,
-  scoreBrainTest,
-  SECTOR_LABEL,
-  SECTORS,
-  STEP_COUNT,
+  LOBE_NAME,
+  LOBES,
+  nameIdeas,
+  NOGGIN_LINE,
+  orderLobes,
+  PACE_STEP,
+  starterPicks,
+  SUGGESTIONS,
+  type BestId,
   type BrainTestDraft,
-  type BrainTestResult,
-  type GoalId,
-  type OutcomeId,
-  type PatternId,
-  type RecoveryId,
-  type Sector,
-  type SingleStep,
+  type Lobe,
+  type Option,
+  type PaceId,
+  type Suggestion,
 } from "@/content/brainTest";
 import { track } from "@/lib/analytics";
 
-const STORAGE_KEY = "grow.brainTest.v1";
-
 type Phase = "intro" | "steps" | "result";
 
-const EMPTY: BrainTestDraft = { picks: [], goal: null, recovery: null, outcome: null };
+const EMPTY: BrainTestDraft = { focus: [], pace: null, best: null };
+const keyOf = (s: Suggestion) => `${s.lobe}:${s.category}`;
 
-/* ── sessionStorage (private mode may throw; the test works without memory) ── */
-
-const listeners = new Set<() => void>();
-function subscribeStored(cb: () => void) {
-  listeners.add(cb);
-  return () => {
-    listeners.delete(cb);
-  };
-}
-function getStoredRaw(): string | null {
-  try {
-    return window.sessionStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-const getServerRaw = () => null;
-
-function parseStored(raw: string | null): BrainTestDraft | null {
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw) as { picks?: unknown; answers?: Record<string, unknown> };
-    const picks = Array.isArray(parsed.picks) ? (parsed.picks.filter((p) => typeof p === "string") as PatternId[]) : [];
-    const a = parsed.answers ?? {};
-    const draft: BrainTestDraft = {
-      picks,
-      goal: typeof a.goal === "string" ? (a.goal as GoalId) : null,
-      recovery: typeof a.recovery === "string" ? (a.recovery as RecoveryId) : null,
-      outcome: typeof a.outcome === "string" ? (a.outcome as OutcomeId) : null,
-    };
-    return isCompleteAnswers(draft) ? draft : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeStored(draft: BrainTestDraft) {
-  try {
-    const { picks, goal, recovery, outcome } = draft;
-    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ picks, answers: { goal, recovery, outcome } }));
-  } catch {
-    /* storage blocked: the result simply is not remembered */
-  }
-  listeners.forEach((cb) => cb());
-}
-
-function clearStored() {
-  try {
-    window.sessionStorage.removeItem(STORAGE_KEY);
-  } catch {
-    /* ignore */
-  }
-  listeners.forEach((cb) => cb());
-}
-
-/* ── The test ─────────────────────────────────────────────────────────────── */
-
+/**
+ * GROW 6.0's Day 1 on the web: three questions, Noggin answering each one, then the starter
+ * Brainwave the app would seed from the answers, which the visitor can change. Nothing is stored.
+ */
 export function BrainTest() {
   const reduced = useReducedMotion();
-  // Returning visitor: the stored answers are read on the client (null on the server) and the
-  // result is recomputed from them until the visitor starts or retakes the test.
-  const storedRaw = useSyncExternalStore(subscribeStored, getStoredRaw, getServerRaw);
-  const stored = useMemo(() => parseStored(storedRaw), [storedRaw]);
-  const [phaseState, setPhase] = useState<Phase | null>(null);
+  const [phase, setPhase] = useState<Phase>("intro");
   const [step, setStep] = useState(0);
-  const [draftState, setDraft] = useState<BrainTestDraft>(EMPTY);
-  const [hint, setHint] = useState<string | null>(null);
+  const [draft, setDraft] = useState<BrainTestDraft>(EMPTY);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [chosenName, setChosenName] = useState<string | null>(null);
+  const [line, setLine] = useState<{ text: string; n: number }>({ text: NOGGIN_LINE.hello, n: 0 });
   const rootRef = useRef<HTMLDivElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLHeadingElement>(null);
+  const moved = useRef(false);
 
-  const phase: Phase = phaseState ?? (stored ? "result" : "intro");
-  const draft: BrainTestDraft = phaseState === null && stored ? stored : draftState;
+  const say = (text: string) => setLine((l) => ({ text, n: l.n + 1 }));
 
-  const result: BrainTestResult | null = useMemo(
-    () => (phase === "result" && isCompleteAnswers(draft) ? scoreBrainTest(draft) : null),
-    [phase, draft],
-  );
+  const picks = useMemo(() => LOBES.flatMap((l) => SUGGESTIONS[l].filter((s) => picked.has(keyOf(s)))), [picked]);
+  const ideas = useMemo(() => nameIdeas(picks), [picks]);
+  const name = chosenName ?? ideas[0];
 
-  const stepValid = useMemo(() => {
-    switch (step) {
-      case 0:
-        return draft.picks.length >= PATTERN_MIN && draft.picks.length <= PATTERN_MAX;
-      case 1:
-        return draft.goal !== null;
-      case 2:
-        return draft.recovery !== null;
-      default:
-        return draft.outcome !== null;
+  // Each new question (and the result) brings the card's top under the site header and moves focus
+  // to its heading, so keyboard and screen-reader users land on the new question.
+  useEffect(() => {
+    if (!moved.current) return;
+    const root = rootRef.current;
+    if (root) {
+      const headerH = document.querySelector<HTMLElement>(".site-header")?.offsetHeight ?? 52;
+      const top = root.getBoundingClientRect().top;
+      if (top < headerH || top > window.innerHeight * 0.4) {
+        window.scrollTo({ top: Math.max(0, top + window.scrollY - headerH - 12), behavior: reduced ? "auto" : "smooth" });
+      }
     }
-  }, [step, draft]);
+    headRef.current?.focus({ preventScroll: true });
+  }, [phase, step, reduced]);
 
-  // Every step (and the result) lands at the same place: its header just under the site header.
-  // Headings take focus without scrolling; this owns the scroll, so it never alternates between
-  // "hero visible" and "question pinned" from one step to the next. It runs when the new panel
-  // mounts (after the old one has left), so the page height is final and nothing clamps it.
-  const scrollToPanel = useCallback(() => {
-    if (phaseState === null) return;
-    const el = phase === "steps" ? headRef.current : rootRef.current;
-    if (!el) return;
-    const headerH = document.querySelector<HTMLElement>(".site-header")?.offsetHeight ?? 52;
-    const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - headerH - 20);
-    if (Math.abs(top - window.scrollY) < 8) return;
-    window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
-  }, [phase, phaseState, reduced]);
+  const go = (nextPhase: Phase, nextStep = 0) => {
+    moved.current = true;
+    setPhase(nextPhase);
+    setStep(nextStep);
+  };
 
-  const start = useCallback(() => {
-    setDraft(EMPTY);
-    setStep(0);
-    setHint(null);
-    setPhase("steps");
+  const start = () => {
     track("brain_test_started");
-  }, []);
-
-  const next = useCallback(() => {
-    if (!stepValid) {
-      setHint(step === 0 ? copy.pickAtLeastOne : copy.pickOneToContinue);
-      return;
-    }
-    track("brain_test_step", { step: step + 1 });
-    if (step < STEP_COUNT - 1) {
-      setHint(null);
-      setStep(step + 1);
-      return;
-    }
-    if (isCompleteAnswers(draft)) {
-      const r = scoreBrainTest(draft);
-      writeStored(draft);
-      track("brain_test_completed", { card: r.card.id, sector: r.dominant, size: r.actions.length });
-      setPhase("result");
-    }
-  }, [step, stepValid, draft]);
-
-  const clearHint = useCallback(() => setHint(null), []);
-
-  const back = useCallback(() => {
-    if (step > 0) {
-      setHint(null);
-      setStep(step - 1);
-    }
-  }, [step]);
-
-  const retake = useCallback(() => {
-    clearStored();
     setDraft(EMPTY);
-    setStep(0);
-    setHint(null);
-    setPhase("steps");
-    track("brain_test_started", { retake: true });
-  }, []);
+    say(NOGGIN_LINE.focus);
+    go("steps", 0);
+  };
 
-  const togglePick = useCallback((id: PatternId) => {
-    setDraft((d) => {
-      const has = d.picks.includes(id);
-      if (has) return { ...d, picks: d.picks.filter((p) => p !== id) };
-      if (d.picks.length >= PATTERN_MAX) return d;
-      return { ...d, picks: [...d.picks, id] };
-    });
-    setHint(null);
-  }, []);
+  const toggleFocus = (id: Lobe) => {
+    const on = !draft.focus.includes(id);
+    const focus = orderLobes(on ? [...draft.focus, id] : draft.focus.filter((l) => l !== id));
+    setDraft({ ...draft, focus });
+    if (!on) say(NOGGIN_LINE.drain);
+    else say(focus.length === 3 ? NOGGIN_LINE.allThree : FOCUS_STEP.options.find((o) => o.id === id)!.say);
+  };
 
-  function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-    if (phase !== "steps") return;
-    const target = e.target as HTMLElement;
-    if (e.key === "Escape" && step > 0) {
-      e.preventDefault();
-      back();
-      return;
+  const choosePace = (id: PaceId) => {
+    setDraft({ ...draft, pace: id });
+    say(PACE_STEP.options.find((o) => o.id === id)!.say);
+  };
+
+  const chooseBest = (id: BestId) => {
+    setDraft({ ...draft, best: id });
+    say(BEST_STEP.options.find((o) => o.id === id)!.say);
+  };
+
+  const stepValid = step === 0 ? draft.focus.length > 0 : step === 1 ? draft.pace !== null : draft.best !== null;
+
+  const next = () => {
+    if (!stepValid) return;
+    track("brain_test_step", { step: step + 1 });
+    if (step === 0) {
+      say(NOGGIN_LINE.pace);
+      go("steps", 1);
+    } else if (step === 1) {
+      say(NOGGIN_LINE.best);
+      go("steps", 2);
+    } else if (isCompleteAnswers(draft)) {
+      setPicked(new Set(starterPicks(draft).map(keyOf)));
+      setChosenName(null);
+      say(draft.pace === "packed" ? NOGGIN_LINE.tiny : NOGGIN_LINE.build);
+      track("brain_test_completed", { focus: draft.focus.join("+"), pace: draft.pace, best: draft.best });
+      go("result");
     }
-    if (e.key === "Enter" && !target.closest("button, a, input, textarea, select")) {
-      e.preventDefault();
-      next();
+  };
+
+  const back = () => {
+    if (step === 0) {
+      say(NOGGIN_LINE.hello);
+      go("intro");
+    } else go("steps", step - 1);
+  };
+
+  const togglePick = (s: Suggestion) => {
+    const k = keyOf(s);
+    const nextSet = new Set(picked);
+    if (nextSet.has(k)) {
+      nextSet.delete(k);
+      say(NOGGIN_LINE.drain);
+    } else {
+      nextSet.add(k);
+      say(ADD_LINE[s.category]);
     }
-  }
+    setPicked(nextSet);
+  };
 
-  const variants = reduced
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
-    : { initial: { opacity: 0, x: 16 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -16 } };
-  const enterT = reduced ? { duration: 0.12 } : { duration: 0.24, ease: [0.2, 0.7, 0.2, 1] as const };
-  const exitT = reduced ? { duration: 0.12 } : { duration: 0.18, ease: [0.4, 0, 1, 1] as const };
+  const retake = () => {
+    setDraft(EMPTY);
+    setPicked(new Set());
+    setChosenName(null);
+    say(NOGGIN_LINE.hello);
+    go("intro");
+  };
 
-  const panelKey = phase === "steps" ? `step-${step}` : phase;
+  const sky = phase === "intro" ? "dawn" : (draft.best ?? "dawn");
+  const panelKey = phase === "steps" ? `steps-${step}` : phase;
+  const motionProps = reduced
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.15 } }
+    : {
+        initial: { opacity: 0, y: 16 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -8 },
+        transition: { duration: 0.32, ease: [0.2, 0.7, 0.2, 1] as const },
+      };
 
   return (
-    <div ref={rootRef} className="bt" data-phase={phase} onKeyDown={onKeyDown}>
-      {phase === "steps" && (
-        <div className="bt-head" ref={headRef}>
-          <p className="bt-step-label" aria-live="polite">
-            {copy.stepLabel(step + 1, STEP_COUNT)}
-          </p>
-          <div className="bt-progress" role="progressbar" aria-valuemin={1} aria-valuemax={STEP_COUNT} aria-valuenow={step + 1} aria-label="Brain Test progress">
-            <span className="bt-progress-fill" style={{ width: `${((step + 1) / STEP_COUNT) * 100}%` }} />
-          </div>
-        </div>
-      )}
+    <div ref={rootRef} className="bt" data-phase={phase}>
+      <div className="bt-main">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={panelKey} className="bt-panel" {...motionProps}>
+            {phase === "intro" && (
+              <div className="bt-intro">
+                <p className="bt-eyebrow">{copy.eyebrow}</p>
+                <Title lines={copy.headline} as="h1" id="test-title" />
+                <p className="gd-sub">{copy.intro}</p>
+                <div className="bt-start">
+                  <button type="button" className="bt-btn" onClick={start}>
+                    {copy.startCta}
+                    <Chevron />
+                  </button>
+                  <p className="gd-note">{copy.startMeta}</p>
+                </div>
+              </div>
+            )}
 
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div key={panelKey} className="bt-panel" initial={variants.initial} animate={{ ...variants.animate, transition: enterT }} exit={{ ...variants.exit, transition: exitT }}>
-          <OnMount fn={scrollToPanel} />
-          {phase === "intro" && <Intro onStart={start} />}
-          {phase === "steps" && step === 0 && <PatternStep picks={draft.picks} onToggle={togglePick} />}
-          {phase === "steps" && step === 1 && <SingleChoice step={GOAL_STEP} value={draft.goal} onPick={clearHint} onChange={(goal) => setDraft((d) => ({ ...d, goal }))} />}
-          {phase === "steps" && step === 2 && <SingleChoice step={RECOVERY_STEP} value={draft.recovery} onPick={clearHint} onChange={(recovery) => setDraft((d) => ({ ...d, recovery }))} />}
-          {phase === "steps" && step === 3 && <SingleChoice step={OUTCOME_STEP} value={draft.outcome} onPick={clearHint} onChange={(outcome) => setDraft((d) => ({ ...d, outcome }))} />}
-          {phase === "result" && result && <Result result={result} onRetake={retake} takeFocus={phaseState !== null} />}
-        </motion.div>
-      </AnimatePresence>
+            {phase === "steps" && (
+              <div className="bt-step">
+                <h1 className="sr-only">{copy.eyebrow}</h1>
+                <div className="bt-progress" aria-hidden="true">
+                  {[0, 1, 2].map((i) => (
+                    <i key={i} data-on={i <= step || undefined} />
+                  ))}
+                </div>
+                <p className="bt-label">{copy.stepLabel(step + 1)}</p>
+                {step === 0 && (
+                  <Question prompt={FOCUS_STEP.prompt} help={FOCUS_STEP.help} headRef={headRef}>
+                    {FOCUS_STEP.options.map((o) => (
+                      <OptionButton key={o.id} option={o} kind="focus" on={draft.focus.includes(o.id)} onClick={() => toggleFocus(o.id)} art={<span className="bt-opt-lobe" data-lobe={o.id} />} />
+                    ))}
+                  </Question>
+                )}
+                {step === 1 && (
+                  <Question prompt={PACE_STEP.prompt} help={PACE_STEP.help} headRef={headRef}>
+                    {PACE_STEP.options.map((o) => (
+                      <OptionButton key={o.id} option={o} kind="one" on={draft.pace === o.id} onClick={() => choosePace(o.id)} art={<span className="bt-opt-icon">{PACE_ICON[o.id]}</span>} />
+                    ))}
+                  </Question>
+                )}
+                {step === 2 && (
+                  <Question prompt={BEST_STEP.prompt} help={BEST_STEP.help} headRef={headRef}>
+                    {BEST_STEP.options.map((o) => (
+                      <OptionButton key={o.id} option={o} kind="one" on={draft.best === o.id} onClick={() => chooseBest(o.id)} art={<span className="bt-opt-sky" data-sky={o.id}>{o.id === "evening" ? <Moon /> : <Sun />}</span>} />
+                    ))}
+                  </Question>
+                )}
+                <div className="bt-nav">
+                  <button type="button" className="bt-btn bt-btn-soft bt-back" onClick={back}>
+                    <ChevronLeft />
+                    <span className="bt-back-text">{copy.back}</span>
+                  </button>
+                  <button type="button" className="bt-btn" onClick={next} disabled={!stepValid}>
+                    {step === 0 ? focusCta(draft.focus) : step === 2 ? copy.seeResult : copy.continue}
+                    <Chevron />
+                  </button>
+                </div>
+              </div>
+            )}
 
-      {phase === "steps" && (
-        <div className="bt-foot">
-          <p className="bt-foot-hint" role="status" aria-live="polite">
-            {hint}
-          </p>
-          {step > 0 && (
-            <button type="button" className="bt-back" onClick={back}>
-              {copy.back}
-            </button>
-          )}
-          <button type="button" className="btn-primary bt-continue" onClick={next} aria-disabled={!stepValid || undefined}>
-            {step === STEP_COUNT - 1 ? copy.seeResult : copy.continue}
-          </button>
+            {phase === "result" && draft.pace && draft.best && (
+              <div className="bt-result">
+                <h1 className="sr-only">{copy.eyebrow}</h1>
+                <p className="bt-eyebrow">{copy.result.kicker}</p>
+                <h2 ref={headRef} tabIndex={-1} className="gd-title bt-name">
+                  <PlanName name={name} />
+                </h2>
+                <p className="bt-sub">{copy.result.sub(picks.length)}</p>
+
+                <div className="bt-names" role="group" aria-label={copy.result.otherNames}>
+                  <span className="bt-label">{copy.result.otherNames}</span>
+                  {ideas
+                    .filter((n) => n !== name)
+                    .slice(0, 3)
+                    .map((n) => (
+                      <button key={n} type="button" className="bt-name-chip" onClick={() => setChosenName(n)}>
+                        {n}
+                      </button>
+                    ))}
+                </div>
+
+                <div className="bt-lobes">
+                  {LOBES.map((l) => {
+                    const n = picks.filter((p) => p.lobe === l).length;
+                    return (
+                      <section key={l} className="bt-lobe" data-lobe={l} aria-label={LOBE_NAME[l]}>
+                        <header>
+                          <span className="bt-lobe-pill">{LOBE_NAME[l]}</span>
+                          <span className="bt-lobe-n">{copy.result.picked(n)}</span>
+                        </header>
+                        <div className="bt-chips">
+                          {SUGGESTIONS[l].map((s) => {
+                            const on = picked.has(keyOf(s));
+                            return (
+                              <button key={s.category} type="button" className="bt-chip" aria-pressed={on} onClick={() => togglePick(s)}>
+                                {on ? <Check /> : <Plus />}
+                                {actionName(s, draft.pace!)}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    );
+                  })}
+                </div>
+
+                <p className="bt-rules">{copy.result.rules}</p>
+
+                <div className="bt-checkins">
+                  <h3 className="bt-label">{copy.result.checkinsTitle}</h3>
+                  <ul>
+                    {CHECKINS[draft.best].map((c) => (
+                      <li key={c.at}>
+                        <span className="bt-checkin-at">{c.at}</span>
+                        <span className="bt-checkin-line">{c.line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="bt-checkins-sub">{copy.result.checkinsSub}</p>
+                </div>
+
+                <div className="bt-cta">
+                  <p className="bt-cta-title">{copy.result.ctaTitle}</p>
+                  <AppStoreButton location="brain_test" />
+                  <p className="gd-note">{copy.result.ctaNote}</p>
+                  <button type="button" className="bt-btn bt-btn-soft" onClick={retake}>
+                    {copy.result.retake}
+                  </button>
+                </div>
+
+                <p className="bt-fine">{copy.result.disclaimer}</p>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="bt-stage" data-sky={sky}>
+        <i className="bt-sky" data-k="dawn" aria-hidden="true" />
+        <i className="bt-sky" data-k="morning" aria-hidden="true" />
+        <i className="bt-sky" data-k="midday" aria-hidden="true" />
+        <i className="bt-sky" data-k="evening" aria-hidden="true" />
+        <p key={line.n} className="bt-bubble" aria-live="polite">
+          {line.text}
+        </p>
+        <div className="bt-noggin">
+          <Image
+            src={phase === "result" ? "/media/kit/noggin-3d-check.webp" : "/media/kit/noggin-3d-wave.webp"}
+            alt={phase === "result" ? "Noggin holding a big green tick." : "Noggin, a little brain with green, blue and sky-blue lobes, waving."}
+            width={1100}
+            height={1100}
+            priority
+            sizes="(max-width: 48rem) 44vw, 380px"
+            className="gd-float"
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
-/* ── Runs `fn` when its panel mounts (each panel has its own key) ───────────── */
-
-function OnMount({ fn }: { fn: () => void }) {
-  useEffect(() => {
-    fn();
-    // Only on mount: the panel key changes with every step, so each step gets one call.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return null;
-}
-
-/* ── Intro ─────────────────────────────────────────────────────────────────── */
-
-function Intro({ onStart }: { onStart: () => void }) {
-  return (
-    <div className="bt-intro">
-      <button type="button" className="btn-primary bt-start" onClick={onStart}>
-        {copy.startCta}
-      </button>
-      <p className="bt-intro-meta">{copy.startMeta}</p>
-    </div>
-  );
-}
-
-/* ── A step heading that takes focus when it appears ───────────────────────── */
-
-function StepHeading({ id, children, help }: { id: string; children: ReactNode; help: ReactNode }) {
-  const ref = useRef<HTMLHeadingElement>(null);
-  useEffect(() => {
-    ref.current?.focus({ preventScroll: true });
-  }, []);
+/** The plan's name with its last word in the accent colour ("Steady Climb."). */
+function PlanName({ name }: { name: string }) {
+  const i = name.lastIndexOf(" ");
+  if (i < 0) return <em>{name}.</em>;
   return (
     <>
-      <h2 id={id} ref={ref} tabIndex={-1} className="bt-prompt">
-        {children}
-      </h2>
-      <div className="bt-help-row">{help}</div>
+      <span>{name.slice(0, i + 1)}</span>
+      <em>{name.slice(i + 1)}.</em>
     </>
   );
 }
 
-/* ── Step 1: patterns ──────────────────────────────────────────────────────── */
-
-function PatternStep({ picks, onToggle }: { picks: PatternId[]; onToggle: (id: PatternId) => void }) {
-  const full = picks.length >= PATTERN_MAX;
-  const helpText = full ? copy.sixIsTheLimit : PATTERN_STEP.help;
+function Question({ prompt, help, headRef, children }: { prompt: string; help: string; headRef: RefObject<HTMLHeadingElement | null>; children: ReactNode }) {
   return (
-    <div className="bt-step" data-step="patterns">
-      <StepHeading
-        id="bt-prompt-patterns"
-        help={
-          <>
-            <p className="bt-help" role="status" aria-live="polite">
-              {helpText}
-            </p>
-            <p className="bt-count" aria-hidden="true">
-              {picks.length} / {PATTERN_MAX}
-            </p>
-          </>
-        }
-      >
-        {PATTERN_STEP.prompt}
-      </StepHeading>
-
-      <div className="bt-groups">
-        {SECTORS.map((sector) => (
-          <div key={sector} className="bt-group" role="group" aria-labelledby={`bt-group-${sector}`}>
-            <p id={`bt-group-${sector}`} className="band-eyebrow bt-group-title" data-sector={sector}>
-              <span className="band-eyebrow-dot" aria-hidden="true" />
-              {SECTOR_LABEL[sector]}
-            </p>
-            <div className="bt-chips">
-              {PATTERNS.filter((p) => p.sector === sector).map((p) => {
-                const on = picks.includes(p.id);
-                const blocked = full && !on;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    className="bt-chip"
-                    data-sector={sector}
-                    aria-pressed={on}
-                    aria-disabled={blocked || undefined}
-                    onClick={() => {
-                      if (!blocked) onToggle(p.id);
-                    }}
-                  >
-                    {p.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ── Steps 2–4: one answer ─────────────────────────────────────────────────── */
-
-function SingleChoice<Id extends string>({
-  step,
-  value,
-  onChange,
-  onPick,
-}: {
-  step: SingleStep<Id>;
-  value: Id | null;
-  onChange: (id: Id) => void;
-  onPick?: () => void;
-}) {
-  const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const focusIndex = Math.max(
-    0,
-    step.options.findIndex((o) => o.id === value),
-  );
-
-  function onKey(e: KeyboardEvent<HTMLDivElement>) {
-    const i = refs.current.findIndex((el) => el === document.activeElement);
-    if (i === -1) return;
-    const n = step.options.length;
-    let to: number | null = null;
-    if (e.key === "ArrowDown" || e.key === "ArrowRight") to = (i + 1) % n;
-    else if (e.key === "ArrowUp" || e.key === "ArrowLeft") to = (i - 1 + n) % n;
-    else if (e.key === "Home") to = 0;
-    else if (e.key === "End") to = n - 1;
-    if (to === null) return;
-    e.preventDefault();
-    refs.current[to]?.focus();
-  }
-
-  return (
-    <div className="bt-step" data-step={step.id}>
-      <StepHeading
-        id={`bt-prompt-${step.id}`}
-        help={
-          <p className="bt-help">{step.help}</p>
-        }
-      >
-        {step.prompt}
-      </StepHeading>
-      <div className="bt-radios" role="radiogroup" aria-labelledby={`bt-prompt-${step.id}`} onKeyDown={onKey}>
-        {step.options.map((o, i) => {
-          const checked = o.id === value;
-          return (
-            <button
-              key={o.id}
-              ref={(el) => {
-                refs.current[i] = el;
-              }}
-              type="button"
-              role="radio"
-              aria-checked={checked}
-              tabIndex={i === focusIndex ? 0 : -1}
-              className="bt-radio"
-              onClick={() => {
-                onChange(o.id);
-                onPick?.();
-              }}
-            >
-              <span className="bt-ring" aria-hidden="true" />
-              <span className="bt-radio-label">{o.label}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ── Result ────────────────────────────────────────────────────────────────── */
-
-function Result({ result, onRetake, takeFocus }: { result: BrainTestResult; onRetake: () => void; takeFocus: boolean }) {
-  const reduced = useReducedMotion();
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  // Fills rise from 0 once the screen is on (instant under reduced motion).
-  const [risen, setRisen] = useState(Boolean(reduced));
-  useEffect(() => {
-    // The title takes focus when the visitor has just finished the test, so a screen reader
-    // announces the result. A returning visitor keeps the page as it was (no stray focus ring).
-    if (takeFocus) titleRef.current?.focus({ preventScroll: true });
-    const raf = requestAnimationFrame(() => setRisen(true));
-    return () => cancelAnimationFrame(raf);
-    // Mount only: takeFocus describes how this screen was reached.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fills = risen ? result.fills : { physical: 0, mental: 0, life: 0 };
-  const r = copy.result;
-
-  return (
-    <section className="bt-result" aria-labelledby="bt-result-title">
-      <p className="band-eyebrow bt-result-kicker" data-sector={result.lead}>
-        <span className="band-eyebrow-dot" aria-hidden="true" />
-        {r.kicker}
-      </p>
-      <h2 id="bt-result-title" ref={titleRef} tabIndex={-1} className="bt-result-title">
-        <span className="sr-only">{r.kicker}: </span>
-        {result.card.name}
+    <>
+      <h2 ref={headRef} tabIndex={-1} className="bt-q">
+        {prompt}
       </h2>
-      <p className="bt-result-line">{result.card.line}</p>
-
-      <div className="bt-result-grid">
-        <figure className="bt-brain">
-          <div className="bt-brain-art">
-            <div className="brain-halo" aria-hidden="true" />
-            <GrowBrain id="bt-result" fills={fills} label={`Your starter Brainwave, weighted towards ${SECTOR_LABEL[result.lead]}`} />
-          </div>
-          <figcaption className="bt-brain-caption">{result.brainCaption}</figcaption>
-        </figure>
-        <div className="bt-result-text">
-          <p className="bt-why">{result.why}</p>
-          <p className="bt-brain-note">{r.brainNote}</p>
-        </div>
+      <p className="bt-help">{help}</p>
+      <div className="bt-opts" role="group" aria-label={prompt}>
+        {children}
       </div>
-
-      <h3 className="bt-h3">{r.actionsTitle}</h3>
-      <ol className="bt-actions">
-        {result.actions.map((a, i) => (
-          <li key={a.name} className="bt-action" style={{ "--i": i } as React.CSSProperties}>
-            <span className="bt-action-n" aria-hidden="true">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <span className="bt-action-body">
-              <span className="bt-action-name">{a.name}</span>
-              <span className="bt-action-sub">{a.fromPattern ? `${a.fromPattern.label}. ${a.fromPattern.why}` : `${CATEGORY_LABEL[a.category]}. ${a.why}`}</span>
-            </span>
-            <SectorTag sector={a.sector} />
-          </li>
-        ))}
-      </ol>
-
-      <div className="bt-notes">
-        <div className="bt-note">
-          <h3 className="bt-h3">{r.firstTargetTitle}</h3>
-          <p>{result.firstTarget}</p>
-        </div>
-        <div className="bt-note">
-          <h3 className="bt-h3">{r.recoveryTitle}</h3>
-          <p>{result.recovery}</p>
-        </div>
-        {result.busyDay && (
-          <div className="bt-note">
-            <h3 className="bt-h3">{r.busyDayTitle}</h3>
-            <p>{result.busyDay}</p>
-          </div>
-        )}
-      </div>
-
-      <div className="bt-cta">
-        <AppStoreButton location="brain-test-result" />
-        <p className="signup-note">{r.ctaNote}</p>
-      </div>
-
-      <p className="bt-disclaimer">{r.disclaimer}</p>
-      <button type="button" className="bt-retake" onClick={onRetake}>
-        {copy.retake}
-      </button>
-    </section>
+    </>
   );
 }
 
-function SectorTag({ sector }: { sector: Sector }) {
+function OptionButton<Id extends string>({ option, kind, on, onClick, art }: { option: Option<Id>; kind: "focus" | "one"; on: boolean; onClick: () => void; art: ReactNode }) {
   return (
-    <span className="bt-tag" data-sector={sector}>
-      {SECTOR_LABEL[sector]}
-    </span>
+    <button type="button" className="bt-opt" data-kind={kind} data-id={option.id} aria-pressed={on} onClick={onClick}>
+      {art}
+      <span className="bt-opt-txt">
+        <b>{option.name}</b>
+        <span>{option.line}</span>
+      </span>
+      <span className="bt-opt-mark" aria-hidden="true">
+        {on && <Check />}
+      </span>
+    </button>
   );
 }
+
+/* ── Small line icons ─────────────────────────────────────────────────────── */
+
+const svg = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true } as const;
+
+function Check() {
+  return (
+    <svg {...svg} strokeWidth={2.8} className="bt-ico">
+      <path d="m6 12.5 4 4 8-9" />
+    </svg>
+  );
+}
+function Plus() {
+  return (
+    <svg {...svg} strokeWidth={2.4} className="bt-ico">
+      <path d="M12 6v12M6 12h12" />
+    </svg>
+  );
+}
+function Chevron() {
+  return (
+    <svg {...svg} strokeWidth={2.4} className="bt-ico">
+      <path d="m9 6 6 6-6 6" />
+    </svg>
+  );
+}
+function ChevronLeft() {
+  return (
+    <svg {...svg} strokeWidth={2.4} className="bt-ico">
+      <path d="m15 6-6 6 6 6" />
+    </svg>
+  );
+}
+function Sun() {
+  return (
+    <svg {...svg} className="bt-ico">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+    </svg>
+  );
+}
+function Moon() {
+  return (
+    <svg {...svg} className="bt-ico">
+      <path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z" />
+    </svg>
+  );
+}
+
+const PACE_ICON: Record<PaceId, ReactNode> = {
+  packed: (
+    <svg {...svg} className="bt-ico">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </svg>
+  ),
+  steady: (
+    <svg {...svg} className="bt-ico">
+      <path d="M3 12c2.2-3.6 4.4-3.6 6.6 0s4.4 3.6 6.6 0 3.6-3.6 4.8-1.8" />
+    </svg>
+  ),
+  wild: (
+    <svg {...svg} className="bt-ico">
+      <path d="M3 12h3.5l2.5-6 4 12 3-8 1.5 2H21" />
+    </svg>
+  ),
+};

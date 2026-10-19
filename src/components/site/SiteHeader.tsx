@@ -8,9 +8,10 @@ import { AppStoreLink } from "@/components/CtaLinks";
 import { copy } from "@/config/copy";
 import { site } from "@/config/site";
 
-// The Brain Test (/brain-test, label copy.nav.brainTest) is hidden from the header since
-// 2026-10-19: it still describes 5.x rules. Add it back here once it is rebuilt for 6.0.
-const tabs = [{ href: "/about", label: copy.nav.about }];
+const tabs = [
+  { href: "/about", label: copy.nav.about },
+  { href: "/brain-test", label: copy.nav.brainTest },
+];
 
 /** Product navigation and a persistent download link. Legal links live in the footer. */
 export function SiteHeader() {

@@ -5,9 +5,9 @@ import { Reveal } from "@/components/motion/Reveal";
 import { PageEffects } from "@/components/PageEffects";
 import { AppStoreButton } from "@/components/site/AppStoreButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { Title } from "@/components/site/Title";
 import { copy } from "@/config/copy";
 import { site } from "@/config/site";
-import type { Headline } from "@/content/home";
 
 import "../home.css";
 import "./about.css";
@@ -35,20 +35,6 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", title: "About GROW", description: copy.about.description, images: [shareImage] },
 };
-
-/** A two-line headline with its one accent word, as on the home page. */
-function Title({ lines, as: Tag = "h2", id }: { lines: Headline; as?: "h1" | "h2"; id?: string }) {
-  return (
-    <Tag className="gd-title" id={id}>
-      {lines.map((line, i) => (
-        <span key={i} className="gd-line">
-          {line.map((p, j) => (p.accent ? <em key={j}>{p.text}</em> : <span key={j}>{p.text}</span>))}
-          {i < lines.length - 1 && " "}
-        </span>
-      ))}
-    </Tag>
-  );
-}
 
 export default function AboutPage() {
   const c = copy.about;
