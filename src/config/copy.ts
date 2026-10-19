@@ -102,7 +102,7 @@ export const copy = {
   },
 
   footer: {
-    tagline: "A daily consistency app by Talon Build LLC. Available now on the App Store.",
+    tagline: "GROW, a daily habit app by Talon Build LLC.",
   },
 
   form: {

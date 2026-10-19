@@ -20,11 +20,9 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="site-header-inner">
         <Link href="/" className="home-link" aria-label={`${site.name} — home`} aria-current={pathname === "/" ? "page" : undefined}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/media/kit/brand-app-icon.webp" alt="" width={28} height={28} className="home-app-icon" />
           <Wordmark className="text-[1rem]" />
-          <svg viewBox="0 0 24 24" className="home-icon" aria-hidden="true">
-            <path d="M3.5 10.6 12 3.8l8.5 6.8" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M5.6 9.4V20h4.8v-5.6h3.2V20h4.8V9.4" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
         </Link>
         <nav aria-label="Primary" className="site-nav">
           {tabs.map((t) => (

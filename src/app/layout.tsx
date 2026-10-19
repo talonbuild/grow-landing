@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Unbounded } from "next/font/google";
+import { Nunito, Unbounded } from "next/font/google";
 
 import { AnalyticsScripts } from "@/components/AnalyticsScripts";
 import { ScrollBackground } from "@/components/site/ScrollBackground";
@@ -14,6 +14,13 @@ import "./globals.css";
 const unbounded = Unbounded({
   subsets: ["latin"],
   variable: "--font-unbounded",
+  display: "swap",
+});
+
+// Nunito (SIL OFL) — the app's body face (GROW 6.0, per the Claude Design kit).
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
   display: "swap",
 });
 
@@ -51,7 +58,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={unbounded.variable} suppressHydrationWarning>
+    <html lang="en" className={`${unbounded.variable} ${nunito.variable}`} suppressHydrationWarning>
       <body className="font-sans text-ink antialiased">
         <a href="#main" className="skip-link">
           Skip to content

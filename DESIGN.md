@@ -127,7 +127,13 @@ motion:
 
 GROW's single source of truth for the website redesign. It is the **source for this repo's brand**: when a skill (design-taste-frontend, image-to-code, web-design-guidelines) or a reference DESIGN.md suggests a different style, this file wins.
 
-Sources: the site's tokens (`src/app/globals.css`), the GROW 6.0 app stylesheet and Noggin rig (`~/Desktop/Noggin Current/GROW 6.0 — LATEST from Leo (2026-10-12).html`), the Noggin montage brief (`~/Developer/grow-noggin-montage/DESIGN.md`), the Social Identity North Star, and the Mega Marketing Plan chapter 10.
+**Visual reference (Marcos, 2026-10-18): `~/Desktop/Claude Design TikTok Carousels/`** (read its `_GUIDE.md`). It holds the real GROW 6.0 screens, Noggin poses and 3D renders, the App Store set, and the brand. Where this file and the kit differ, the kit wins:
+- the page colour is `#ebf1f7`;
+- body text is Nunito;
+- marketing headlines are big Unbounded in sentence case with ONE coloured word, as in the App Store set (the caps rule still applies to labels, pills and buttons);
+- the 3D Noggin renders are welcome for hero moments.
+
+Older sources: the site's tokens (`src/app/globals.css`), the GROW 6.0 app stylesheet and Noggin rig (`~/Desktop/Noggin Current/GROW 6.0 — LATEST from Leo (2026-10-12).html`), the Noggin montage brief (`~/Developer/grow-noggin-montage/DESIGN.md`), the Social Identity North Star, and the Mega Marketing Plan chapter 10.
 
 ## Overview
 
@@ -292,7 +298,7 @@ Noggin is a pocket copy of the person's own three-lobe brain. Noggin is the only
 ## Imagery and proof
 
 - **Real product only:** app recordings and screens from the **shipped** build. The 6.0 recordings in `~/Desktop/Grow Montages/Grow 6.0 - Clean UI Showcases` can go live only once they match what is in the App Store.
-- **Worlds:** the three 6.0 sector world renders (glass platforms) for PHYSICAL, MENTAL and LIFE backdrops.
+- **No 3D room renders.** The AI-generated "sector world" rooms (gym terrace, den, villa interior) are rejected by Marcos (2026-10-17) as against the app's aesthetic. Noggin's stage is the app's own Home stage: the morning sky, a glass floor, and a soft lobe-coloured light.
 - **People:** real founder photos (Marcos and Leo), and real users only with permission. There are no stock "happy app user" photos.
 - **Proof:** current App Store rating with its source and date, and permissioned quotes with context. Leave the slot out rather than fake it.
 

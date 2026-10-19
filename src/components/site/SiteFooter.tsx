@@ -4,15 +4,12 @@ import { copy } from "@/config/copy";
 import { legalDocs } from "@/content/legal";
 import { site } from "@/config/site";
 
-/** One quiet line at the very bottom, on whatever band ends the page. */
+/** One quiet line at the very bottom: what this is · links · year. */
 export function SiteFooter() {
   return (
     <footer className="site-footer">
       <p className="site-footer-tagline">{copy.footer.tagline}</p>
       <div className="site-footer-row">
-        <span>
-          © {new Date().getFullYear()} {site.company}
-        </span>
         {legalDocs.map((d) => (
           <Link key={d.slug} href={d.path} className="footer-link">
             {d.title}
@@ -29,6 +26,9 @@ export function SiteFooter() {
           </a>
         )}
       </div>
+      <span className="site-footer-year">
+        © {new Date().getFullYear()} {site.company}
+      </span>
     </footer>
   );
 }

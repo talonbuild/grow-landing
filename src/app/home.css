@@ -1,0 +1,556 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   GROW home — concept "One GROW day" (2026-10-18).
+   Reference: ~/Desktop/Claude Design TikTok Carousels (the real 6.0 app and its App Store set).
+   The page is a stack of separated cards, one idea each, coloured like one day with Noggin:
+   dawn → morning → midday → afternoon → evening → night → morning → sunrise on Day 90.
+   Figma 2026 trends it draws on: 3D (Noggin renders), vibrant colour, bold type,
+   scroll storytelling, gamified moments (medal, Day 90), lean pages (WebP, ~1 MB of art).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.gd {
+  --page: #ebf1f7;
+  --ink: #0b1f2a;
+  --soft: #3a4c56;
+  --muted: #56666f;
+  --physical: #16885c;
+  --mental: #164b91;
+  --life: #65a8cf;
+  --life-ink: #1b5375;
+  --gold: #a86400;
+  --spark: #5b3fb8;
+
+  --gap: 16px;
+  --radius: 44px;
+  --pad: clamp(2rem, 6vw, 5.5rem);
+
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-nunito), Arial, sans-serif;
+  font-weight: 500;
+  padding: calc(var(--header-h) + 4px) var(--gap) 0;
+}
+html:has(.gd) {
+  --header-bg: #ebf1f7;
+  background: #ebf1f7;
+}
+.gd :focus-visible {
+  outline: 3px solid var(--mental);
+  outline-offset: 3px;
+}
+
+/* Type ----------------------------------------------------------------------- */
+.gd-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.25rem, 3.5vw, 3.25rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.gd-title span,
+.gd-title em {
+  font-style: normal;
+}
+.gd-line {
+  display: block;
+}
+.gd-title em {
+  color: var(--accent, var(--physical));
+}
+.gd-hero .gd-title {
+  font-size: clamp(2.6rem, 6.4vw, 5.9rem);
+}
+.gd-sub {
+  font-size: 1.3125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--soft);
+  text-wrap: balance;
+}
+.gd-body {
+  max-width: 36ch;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--soft);
+}
+.gd-note {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Cards: one idea each, separated by the page colour ---------------------------- */
+.gd-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  margin-bottom: var(--gap);
+  isolation: isolate;
+}
+.gd-card[data-tone="dawn"] {
+  background: linear-gradient(180deg, #e8e0fb 0%, #f3e4f1 46%, #fde8d4 100%);
+}
+.gd-card[data-tone="mint"] {
+  background: linear-gradient(180deg, #d6f1e3 0%, #edf8f2 100%);
+}
+.gd-card[data-tone="sky"] {
+  background: linear-gradient(180deg, #d5e8f8 0%, #eef6fc 100%);
+}
+.gd-card[data-tone="gold"] {
+  background: linear-gradient(180deg, #fdf0d8 0%, #fbe1bf 100%);
+}
+.gd-card[data-tone="lilac"] {
+  background: linear-gradient(180deg, #e3dcfb 0%, #f2eefe 100%);
+}
+.gd-card[data-tone="night"] {
+  background: linear-gradient(180deg, #211f57 0%, #383283 100%);
+  color: #fff;
+}
+.gd-card[data-tone="sunrise"] {
+  background: linear-gradient(180deg, #fdf2dc 0%, #fde1cd 100%);
+}
+.gd-card[data-tone="paper"] {
+  background: #fff;
+}
+.gd-card[data-tone="night"] .gd-sub,
+.gd-card[data-tone="night"] .gd-body {
+  color: rgb(255 255 255 / 0.86);
+}
+
+/* One accent word per headline, the App Store colours. */
+#how {
+  --accent: var(--mental);
+}
+#worlds {
+  --accent: var(--life-ink);
+}
+#medal,
+#day90 {
+  --accent: var(--gold);
+}
+.gd-widgets {
+  --accent: var(--spark);
+}
+#night {
+  --accent: #c9b8ff;
+}
+#waits,
+.gd-final,
+.gd-hero {
+  --accent: var(--physical);
+}
+
+/* Hero (dawn) --------------------------------------------------------------------- */
+.gd-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100svh - var(--header-h) - 2 * var(--gap));
+  padding: clamp(3.5rem, 9vh, 6.5rem) var(--pad) 0;
+  text-align: center;
+}
+.gd-hero-words {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+  max-width: 54rem;
+}
+.gd-cta {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+.gd-hero-visual {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  min-height: 380px;
+}
+/* The kit's phone frame with a real recording behind its screen hole. */
+.gd-device {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  aspect-ratio: 1360 / 2780;
+  filter: drop-shadow(0 30px 40px rgb(30 40 80 / 0.16));
+}
+.gd-device video {
+  position: absolute;
+  left: 5.662%;
+  top: 2.842%;
+  width: 88.676%;
+  height: 94.317%;
+  object-fit: cover;
+  border-radius: 13.76% / 6.33%;
+  background: #eef3f8;
+}
+.gd-device-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.gd-visual .gd-device {
+  margin-bottom: -18%;
+}
+.gd-world .gd-device {
+  width: min(300px, 100%);
+  margin-bottom: -14%;
+}
+.gd-phone {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 30px 40px rgb(30 40 80 / 0.16));
+}
+.gd-hero-phone {
+  width: min(360px, 62vw);
+  margin-bottom: -22%;
+}
+.gd-noggin {
+  display: block;
+  height: auto;
+}
+.gd-hero-noggin {
+  position: absolute;
+  bottom: 4%;
+  left: calc(50% - min(360px, 62vw) / 2 - min(250px, 30vw));
+  width: min(380px, 40vw);
+}
+
+/* Split cards: words on one side, the product on the other ---------------------------- */
+.gd-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+  min-height: min(880px, 96svh);
+  padding: var(--pad) var(--pad) 0;
+}
+.gd-words {
+  display: grid;
+  gap: 1.25rem;
+  align-content: center;
+  padding-bottom: var(--pad);
+  max-width: 37rem;
+}
+.gd-split[data-side="left"] .gd-words {
+  order: 2;
+}
+.gd-visual {
+  position: relative;
+  align-self: end;
+  justify-self: center;
+  width: min(340px, 100%);
+}
+.gd-visual .gd-phone {
+  margin-bottom: -18%;
+}
+.gd-visual .gd-noggin {
+  position: absolute;
+  width: 78%;
+  bottom: 10%;
+  right: -48%;
+}
+.gd-split[data-side="left"] .gd-visual .gd-noggin {
+  right: auto;
+  left: -48%;
+}
+
+/* Worlds (midday) ------------------------------------------------------------------------- */
+.gd-worlds {
+  padding: var(--pad) var(--pad) 0;
+}
+.gd-center {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+.gd-world-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 3rem);
+  max-width: 1080px;
+  margin: clamp(2.5rem, 6vh, 4rem) auto 0;
+  padding: 0;
+  list-style: none;
+}
+.gd-world {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 1.25rem;
+}
+.gd-world .gd-phone {
+  width: min(300px, 100%);
+  margin-bottom: -14%;
+}
+.gd-world-name {
+  font-size: 1.0625rem;
+  color: var(--soft);
+  text-align: center;
+}
+.gd-world-name strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.3125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.gd-world[data-lobe="physical"] strong {
+  color: var(--physical);
+}
+.gd-world[data-lobe="mental"] strong {
+  color: var(--mental);
+}
+.gd-world[data-lobe="life"] strong {
+  color: var(--life-ink);
+}
+
+/* Widgets (evening) ----------------------------------------------------------------------- */
+.gd-widgets {
+  padding: var(--pad);
+}
+.gd-widget-art {
+  max-width: 1040px;
+  margin: clamp(2rem, 5vh, 3.5rem) auto 0;
+}
+.gd-widget-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 28px;
+}
+
+/* FAQ ---------------------------------------------------------------------------------- */
+.gd-faq {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  padding: var(--pad);
+}
+.gd-faq-list {
+  display: grid;
+}
+.gd-faq-list {
+  gap: 8px;
+}
+.gd-q {
+  border-radius: 22px;
+  background: var(--page);
+  padding: 0 1.5rem;
+}
+.gd-q summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  min-height: 64px;
+  padding: 0.5rem 0;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+}
+.gd-q summary::-webkit-details-marker {
+  display: none;
+}
+.gd-q summary::after {
+  content: "+";
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  transition: transform 0.3s ease;
+}
+.gd-q[open] summary::after {
+  transform: rotate(45deg);
+}
+.gd-q p {
+  max-width: 56ch;
+  padding: 0 0 1.25rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--soft);
+}
+.gd-q a {
+  color: var(--mental);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Final (dawn again) ---------------------------------------------------------------------- */
+.gd-final {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+  padding: clamp(4.5rem, 12vh, 8rem) var(--pad);
+  text-align: center;
+}
+.gd-icon {
+  width: 96px;
+  height: 96px;
+  border-radius: 22px;
+}
+
+.gd .site-footer {
+  max-width: none;
+  margin: 0;
+  padding: 2rem var(--pad) max(2rem, env(safe-area-inset-bottom));
+}
+
+/* Gentle float for Noggin --------------------------------------------------------------- */
+@keyframes gd-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(-1.5deg);
+  }
+}
+.gd-float {
+  animation: gd-float 6s ease-in-out infinite;
+}
+
+/* Tablet: split cards stack ------------------------------------------------------------------ */
+@media (max-width: 63.99rem) {
+  .gd-split {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    min-height: 0;
+    padding-bottom: 0;
+    text-align: center;
+  }
+  .gd-words {
+    justify-items: center;
+    padding-bottom: 0;
+  }
+  .gd-split[data-side="left"] .gd-words {
+    order: 0;
+  }
+  .gd-faq {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Phone ------------------------------------------------------------------------------------- */
+@media (max-width: 47.99rem) {
+  .gd {
+    --gap: 10px;
+    --radius: 32px;
+    --pad: 1.5rem;
+  }
+  .gd-title {
+    font-size: clamp(1.6rem, 7.4vw, 2.4rem);
+  }
+  .gd-hero .gd-title {
+    font-size: clamp(1.9rem, 8.6vw, 2.9rem);
+  }
+  .gd-sub {
+    font-size: 1.0625rem;
+  }
+  .gd-hero {
+    min-height: 0;
+    padding-top: 3rem;
+  }
+  .gd-hero-visual {
+    min-height: 0;
+    margin-top: 2.25rem;
+  }
+  .gd-hero-phone {
+    width: 66vw;
+    margin-bottom: -30%;
+  }
+  .gd-hero-noggin {
+    left: -2vw;
+    width: 44vw;
+    bottom: 6%;
+  }
+  .gd-split {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    min-height: 0;
+    padding: 3rem var(--pad) 0;
+    text-align: center;
+  }
+  .gd-words {
+    justify-items: center;
+    padding-bottom: 0;
+  }
+  .gd-split[data-side="left"] .gd-words {
+    order: 0;
+  }
+  .gd-visual {
+    width: 62vw;
+  }
+  .gd-visual .gd-phone,
+  .gd-visual .gd-device {
+    margin-bottom: -26%;
+  }
+  .gd-visual .gd-noggin,
+  .gd-split[data-side="left"] .gd-visual .gd-noggin {
+    width: 56%;
+    right: -20%;
+    left: auto;
+    bottom: 18%;
+  }
+  .gd-worlds {
+    padding: 3rem 0 0;
+  }
+  .gd-center {
+    padding: 0 var(--pad);
+  }
+  .gd-world-row {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+    padding: 0 18vw;
+    scrollbar-width: none;
+  }
+  .gd-world {
+    flex: 0 0 64vw;
+    scroll-snap-align: center;
+  }
+  .gd-widgets {
+    padding: 3rem 1rem 1rem;
+  }
+  .gd-widget-art img {
+    border-radius: 18px;
+  }
+  .gd-faq {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 2.5rem var(--pad);
+  }
+  .gd-final {
+    padding: 4rem var(--pad);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gd-float {
+    animation: none;
+  }
+  .gd-q summary::after {
+    transition: none;
+  }
+}
