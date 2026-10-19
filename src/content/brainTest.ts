@@ -110,7 +110,7 @@ export const SUGGESTIONS: Record<Lobe, readonly Suggestion[]> = {
   mental: [
     { lobe: "mental", category: "focus", name: "Focus for 10 minutes", tiny: "10 minutes, one tab open" },
     { lobe: "mental", category: "calm", name: "Meditate 10 minutes", tiny: "Three slow breaths" },
-    { lobe: "mental", category: "reflection", name: "Write 3 lines tonight", tiny: "Write one line" },
+    { lobe: "mental", category: "reflection", name: "Journal 3 sentences", tiny: "Write one line" },
   ],
   life: [
     { lobe: "life", category: "space", name: "Make your bed", tiny: "Clear one surface" },
