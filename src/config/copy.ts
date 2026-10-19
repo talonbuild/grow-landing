@@ -30,22 +30,36 @@ export const copy = {
     description: "Hi, we're Marcos and Leo. We make GROW, the habit app where Noggin, your brain buddy, grows every time you show up.",
     eyebrow: "About",
     headline: [[{ text: "We built the buddy" }], [{ text: "we " }, { text: "needed.", accent: true }]] as Headline,
-    sub: "Hi, we're Marcos and Leo. We make GROW.",
-    paragraphs: [
-      "We built GROW because we kept starting over. The plans were fine. The follow-through was not.",
-      "So we gave our habits a buddy. Noggin is a little brain with three lobes: Physical, Mental and Life. You pick a few small actions for each one, and every action you do fills a lobe.",
-      "GROW counts the days you show up, not the days you miss. Miss a day and Noggin waits for you. No catching up, just one small thing when you come back.",
-      "Keep showing up and he keeps growing, one step at a time along the road to Day 90, where he graduates. No perfect streak needed.",
-      "GROW is made by Talon Build LLC, for iPhone and iPad.",
+    /** Noggin introduces himself under the headline, one line each. */
+    sub: ["Hi, my name is Noggin.", "Let me tell you why I was made."],
+    /**
+     * The note, as stanzas of short lines (the first stanza is the lead). Each line stays on one
+     * line; " | " marks where a line breaks again on a phone so nothing wraps.
+     */
+    stanzas: [
+      ["GROW was built because | we kept starting over.", "The plans were fine.", "Our consistency was not."],
+      [
+        "So we gave our habits a buddy.",
+        "Noggin is a little brain | with three lobes:",
+        "Physical, Mental and Life.",
+        "You pick a few small actions | for each one,",
+        "and every action you do | fills a lobe.",
+      ],
+      [
+        "GROW counts the days you show up, | not the days you miss.",
+        "Miss a day | and Noggin waits for you.",
+        "No catching up, | just one small thing | when you come back.",
+      ],
+      ["Keep showing up | and he keeps growing,", "one step at a time | along the road to Day 90,", "where he graduates.", "No perfect streak needed."],
+      ["GROW is made by Talon Build LLC, | for iPhone and iPad."],
     ],
-    contact: "Want to say hi? Write to us at",
+    contact: ["Want to say hi?", "Write to us at"],
     signoff: "Marcos & Leo",
     signoffRole: "Founders of GROW",
     final: {
       headline: [[{ text: "Come say hi" }], [{ text: "to " }, { text: "Noggin.", accent: true }]] as Headline,
-      sub: "Download GROW and pick one small thing for today.",
     },
-    ctaNote: "Free to download for iPhone and iPad",
+    ctaNote: "Begin your 7-day free trial today!",
   },
 
   footer: {

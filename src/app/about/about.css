@@ -76,19 +76,28 @@
 }
 .ab-letter-inner {
   display: grid;
-  gap: 1.25rem;
+  gap: 2rem;
   max-width: 40rem;
   margin: 0 auto;
   font-size: 1.1875rem;
-  line-height: 1.65;
+  line-height: 1.7;
   color: var(--soft);
+}
+/* Short lines, one per row: each line is a block; on a phone it breaks again at its marks. */
+.ab-ln {
+  display: block;
+}
+.ab-frag {
+  display: inline;
 }
 .ab-letter-inner .ab-lead {
   font-size: clamp(1.375rem, 2.2vw, 1.625rem);
   font-weight: 800;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--ink);
-  text-wrap: balance;
+}
+.ab-hero-sub .ab-ln {
+  display: block;
 }
 .ab-mail {
   color: var(--mental);
@@ -131,6 +140,26 @@
 .ab-final {
   --accent: var(--physical);
 }
+/* The App Store button set in GROW's own type. */
+.ab-final .btn-store-brand {
+  min-height: 3.75rem;
+  padding: 0.55rem 1.35rem 0.55rem 1.15rem;
+  border-radius: 1rem;
+}
+.ab-final .btn-store-brand .btn-store-text {
+  font-family: var(--font-display);
+  gap: 0.15rem;
+}
+.ab-final .btn-store-brand .btn-store-small {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.ab-final .btn-store-brand .btn-store-big {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
 
 /* Tablet and phone: the hero stacks, Noggin under the words -------------------------------- */
 @media (max-width: 63.99rem) {
@@ -158,10 +187,21 @@
     font-size: clamp(1.9rem, 8.6vw, 2.9rem);
   }
   .ab-letter {
-    padding: 2.75rem var(--pad);
+    padding: 3rem var(--pad);
   }
   .ab-letter-inner {
-    font-size: 1.0625rem;
+    gap: 1.6rem;
+    font-size: clamp(0.875rem, 4.3vw, 1.0625rem);
+    line-height: 1.65;
+  }
+  .ab-letter-inner .ab-lead {
+    font-size: clamp(1.125rem, 5.2vw, 1.375rem);
+  }
+  .ab-frag {
+    display: block;
+  }
+  .ab-hero-sub {
+    font-size: clamp(0.9375rem, 4.6vw, 1.0625rem);
   }
   .ab-signoff-noggin {
     width: 72px;

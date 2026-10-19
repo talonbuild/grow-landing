@@ -36,6 +36,21 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "About GROW", description: copy.about.description, images: [shareImage] },
 };
 
+/** One line of the note; it breaks again at " | " on a phone, so no line ever wraps. */
+function Line({ text }: { text: string }) {
+  const parts = text.split(" | ");
+  return (
+    <span className="ab-ln">
+      {parts.map((f, i) => (
+        <span key={i} className="ab-frag">
+          {f}
+          {i < parts.length - 1 && " "}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default function AboutPage() {
   const c = copy.about;
   return (
@@ -45,7 +60,13 @@ export default function AboutPage() {
         <div className="ab-hero-words">
           <p className="ab-eyebrow">{c.eyebrow}</p>
           <Title lines={c.headline} as="h1" id="about-title" />
-          <p className="gd-sub">{c.sub}</p>
+          <p className="gd-sub ab-hero-sub">
+            {c.sub.map((l) => (
+              <span key={l} className="ab-ln">
+                {l}
+              </span>
+            ))}
+          </p>
         </div>
         <div className="ab-hero-visual">
           <Image
@@ -63,17 +84,24 @@ export default function AboutPage() {
       {/* Paper: the letter */}
       <section className="gd-card ab-letter" data-tone="paper" aria-label="A note from Marcos and Leo">
         <div className="ab-letter-inner">
-          {c.paragraphs.map((p, i) => (
-            <Reveal as="p" key={i} className={i === 0 ? "ab-lead" : undefined} delay={i * 50} amount={0.2}>
-              {p}
+          {c.stanzas.map((lines, i) => (
+            <Reveal as="p" key={i} className={i === 0 ? "ab-stanza ab-lead" : "ab-stanza"} delay={i * 50} amount={0.2}>
+              {lines.map((l) => (
+                <Line key={l} text={l} />
+              ))}
             </Reveal>
           ))}
-          <Reveal as="p" amount={0.2}>
-            {c.contact}{" "}
-            <a href={`mailto:${site.links.contactEmail}`} className="ab-mail">
-              {site.links.contactEmail}
-            </a>
-            .
+          <Reveal as="p" className="ab-stanza" amount={0.2}>
+            <span className="ab-ln">{c.contact[0]}</span>
+            <span className="ab-ln">
+              <span className="ab-frag">{c.contact[1]} </span>
+              <span className="ab-frag">
+                <a href={`mailto:${site.links.contactEmail}`} className="ab-mail">
+                  {site.links.contactEmail}
+                </a>
+                .
+              </span>
+            </span>
           </Reveal>
           <Reveal className="ab-signoff" amount={0.2}>
             <Image src="/media/kit/noggin-mood-love.webp" alt="" width={400} height={434} className="ab-signoff-noggin" sizes="88px" />
@@ -89,9 +117,8 @@ export default function AboutPage() {
       <section className="gd-card gd-final ab-final" data-tone="mint" aria-labelledby="about-final-title">
         <Image className="gd-icon" src="/media/kit/brand-app-icon.webp" alt="The GROW app icon" width={256} height={256} />
         <Title lines={c.final.headline} id="about-final-title" />
-        <p className="gd-sub">{c.final.sub}</p>
         <div className="gd-cta">
-          <AppStoreButton location="about" />
+          <AppStoreButton location="about" className="btn-store-brand" />
           <p className="gd-note">{c.ctaNote}</p>
         </div>
       </section>
