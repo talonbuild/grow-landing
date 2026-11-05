@@ -24,6 +24,7 @@ The probe checks overlapping text, small text and overflow across the public pag
 
 ## Site structure
 
+- **Download** — `/download/` is the compact Instagram landing page: the app roadmap in an iPhone, Noggin, and a direct App Store badge. It is a self-contained static document in `public/download/index.html`; the header Download tab uses a full-page navigation to it. It has no external asset requests or JavaScript requirement.
 - **Home** — the app's brain artwork, followed by Why Lock In?, Why Prime?, See Your Progress and a final download prompt. The brain's three sector labels link to the corresponding sections and support keyboard navigation.
 - **About** — the story from Marcos and Leo, with a direct App Store link.
 - **Brain Test** — four steps produce a starter Brainwave and suggested actions, followed by an App Store button. It does not submit answers or transfer a plan into the app.
@@ -40,6 +41,7 @@ The daily GROW cycle runs from **5:00 a.m. to 5:00 a.m.** Morning Prime and even
 | App Store URL and ID, launch state, site origin, analytics IDs | `src/config/site.ts` |
 | Shared marketing copy and cycle times | `src/config/copy.ts` |
 | Home sections | `src/components/home/*` |
+| Instagram download page | `public/download/index.html` |
 | App Store button and tracked link | `src/components/site/AppStoreButton.tsx`, `src/components/CtaLinks.tsx` |
 | Brain Test copy, data and scoring | `src/content/brainTest.ts` |
 | Brain Test interface | `src/components/brain-test/BrainTest.tsx` |

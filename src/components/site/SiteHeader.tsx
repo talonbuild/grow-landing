@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { Wordmark } from "@/components/brand/Wordmark";
-import { AppStoreLink } from "@/components/CtaLinks";
 import { copy } from "@/config/copy";
 import { site } from "@/config/site";
 
@@ -30,7 +29,8 @@ export function SiteHeader() {
               {t.label}
             </Link>
           ))}
-          <AppStoreLink location="header" className="nav-download">Download</AppStoreLink>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- This standalone HTML document needs a full navigation. */}
+          <a href="/download/" className="nav-download">Download</a>
         </nav>
       </div>
     </header>
